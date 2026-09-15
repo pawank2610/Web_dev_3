@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Error</title>
+</head>
+
+<body>
+    <h1>Welcome to CORS error</h1>
+    <div id="para">Display data here...</div>
+</body>
+
+</html>
+
+<script>
+    const main = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/student/read");
+            console.log(response); //res => readablestream
+
+            const data = await response.text();
+            console.log(data);
+            // document.getElementById("para").innerText = data
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    main()
+</script>
