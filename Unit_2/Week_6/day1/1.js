@@ -11,7 +11,7 @@ const app = express();
 
 // middleware  --> req.body --> parse
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 app.use("/student", studentRouter);
 app.use("/trainer", trainerRouter);
