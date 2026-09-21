@@ -1,4 +1,4 @@
-.DS_Store
+git ls-files | Select-String "node_modules".DS_Store
 *.DS_Store
 *.mp4
 *.mov
@@ -9,3 +9,4 @@ recording.mp4
 Recording.mp4
 Recording.mov
 
+node_modules
