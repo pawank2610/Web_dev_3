@@ -1,0 +1,12 @@
+{
+  "name": "day2-express-practice",
+  "version": "1.0.0",
+  "description": "Unit 3 Week 1 Day 2 Express routing practice",
+  "main": "1.js",
+  "scripts": {
+    "start": "node 1.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
