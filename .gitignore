@@ -1,4 +1,3 @@
-git ls-files | Select-String "node_modules".DS_Store
 *.DS_Store
 *.mp4
 *.mov
