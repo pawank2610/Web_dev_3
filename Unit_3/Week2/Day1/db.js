@@ -1,20 +1,18 @@
-//step1 import modules
-
+// Step -1 import module
 const mongoose = require("mongoose");
 
-//step2 connection building
-const connection = mongoose.connect("mongodb://127.0.0.1:27017/Spiderman")
+// Step -2 Connection bulding
+const connection = mongoose.connect("mongodb://127.0.0.1:27017/spiderman");
 
-//step3 Making structure
+// Step -3 Making structure 
 const userSchema = new mongoose.Schema({
-    name:String,
-    age:Number,
-
+  name: String,
+  age: Number,
 });
 
-//step4 Making model
+
+// Step -4 Making Model
 const userModel = mongoose.model("user",userSchema);
 
-//ste5 Export module  for using in 1.js
-module.exports = {connection,userModel};
-
+// Step -5 Export module for using in 1.js
+module.exports = {connection, userModel};
