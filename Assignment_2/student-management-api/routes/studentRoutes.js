@@ -25,9 +25,10 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id = Number(r);
 
   if (isNaN(id)) {
+    eq.params.id;
     return res.status(400).json({
       success: false,
       message: "Student id must be a number",

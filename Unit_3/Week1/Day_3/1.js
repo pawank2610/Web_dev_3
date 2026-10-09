@@ -47,10 +47,7 @@ const main = async () => {
     ]);
 
     //step7 update function
-    const user2= await userModel.updateOne(
-    { name: "Pawan" },
-    { age: 23 }
-);
+    const user2 = await userModel.updateOne({ name: "Pawan" }, { age: 23 });
 
     console.log("Students Added:");
     console.log(students);
