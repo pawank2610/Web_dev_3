@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SocketChat – Real-Time Multi-Room Chat Application</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Socket.IO client script -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <!-- Join / Setup Profile Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box setup-modal">
+      <div class="modal-header">
+        <div class="modal-brand">
+          <div class="brand-icon">💬</div>
+          <div>
+            <h2>Join SocketChat</h2>
+            <p>Web Dev III • Unit 3 Week 4 Chat Application</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Choose Your Nickname / Name</label>
+          <input type="text" id="usernameInput" class="form-control" placeholder="e.g. Alex, Pawan, Rahul..." maxlength="20" autofocus>
+        </div>
+
+        <div class="form-group">
+          <label>Select Your Avatar</label>
+          <div class="avatar-grid" id="avatarPicker">
+            <button type="button" class="avatar-btn selected" data-avatar="🧑‍💻">🧑‍💻</button>
+            <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+            <button type="button" class="avatar-btn" data-avatar="🐱">🐱</button>
+            <button type="button" class="avatar-btn" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-btn" data-avatar="🤖">🤖</button>
+            <button type="button" class="avatar-btn" data-avatar="🧙">🧙</button>
+            <button type="button" class="avatar-btn" data-avatar="🌟">🌟</button>
+            <button type="button" class="avatar-btn" data-avatar="🎨">🎨</button>
+            <button type="button" class="avatar-btn" data-avatar="🐼">🐼</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>User Theme Color</label>
+          <div class="color-picker" id="colorPicker">
+            <button type="button" class="color-dot selected" data-color="#6366f1" style="background:#6366f1;"></button>
+            <button type="button" class="color-dot" data-color="#3b82f6" style="background:#3b82f6;"></button>
+            <button type="button" class="color-dot" data-color="#10b981" style="background:#10b981;"></button>
+            <button type="button" class="color-dot" data-color="#f59e0b" style="background:#f59e0b;"></button>
+            <button type="button" class="color-dot" data-color="#ec4899" style="background:#ec4899;"></button>
+            <button type="button" class="color-dot" data-color="#8b5cf6" style="background:#8b5cf6;"></button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" id="btnEnterChat" onclick="handleJoinChat()">
+          Enter Chat Room ➔
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Room Modal -->
+  <div class="modal-overlay hidden" id="createRoomModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create Personal Room</h3>
+        <button class="close-btn" onclick="toggleCreateRoomModal(false)">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Room Name (lowercase, no spaces)</label>
+          <div class="input-with-prefix">
+            <span class="prefix">#</span>
+            <input type="text" id="newRoomName" class="form-control" placeholder="e.g. ai-study, gaming, project-team">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Room Topic / Description</label>
+          <input type="text" id="newRoomDesc" class="form-control" placeholder="What is this room about?">
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="newRoomPrivate" onchange="togglePasswordField()"> 
+            Make this room Private (Password protected)
+          </label>
+        </div>
+        <div class="form-group hidden" id="passwordGroup">
+          <label>Room Password</label>
+          <input type="password" id="newRoomPassword" class="form-control" placeholder="Enter room access password">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="toggleCreateRoomModal(false)">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="handleCreateRoom()">Create & Join</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Private Room Password Modal -->
+  <div class="modal-overlay hidden" id="roomPasswordModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Private Room Authentication</h3>
+        <button class="close-btn" onclick="togglePasswordModal(false)">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" id="passwordModalPrompt">This room is private. Please enter the password to join.</p>
+        <div class="form-group mt-sm">
+          <label>Room Password</label>
+          <input type="password" id="joinRoomPasswordInput" class="form-control" placeholder="Password">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="togglePasswordModal(false)">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="submitRoomPassword()">Join Room</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Layout -->
+  <div class="chat-app-layout">
+    
+    <!-- LEFT SIDEBAR: User, Channels, Rooms, Stats -->
+    <aside class="sidebar-left">
+      <!-- App Header -->
+      <div class="app-brand">
+        <div class="brand-avatar">💬</div>
+        <div class="brand-info">
+          <h2>SocketChat</h2>
+          <span class="server-status"><span class="pulse-dot"></span> <span id="connectionStatusText">Connected</span></span>
+        </div>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="user-profile-card">
+        <div class="user-avatar-badge" id="currentAvatarBadge">🧑‍💻</div>
+        <div class="user-profile-details">
+          <span class="username" id="currentUsername">Guest</span>
+          <span class="user-tag">Active Member</span>
+        </div>
+        <button class="icon-btn" title="Change Profile" onclick="reopenProfileModal()">✏️</button>
+      </div>
+
+      <!-- Classroom Live Banners Ticker -->
+      <div class="classroom-ticker">
+        <div class="ticker-header">
+          <span>📢 Class Announcements</span>
+        </div>
+        <div class="ticker-content" id="classAnnouncementText">
+          "Today is last time we study web dev -3"
+        </div>
+      </div>
+
+      <!-- Rooms Navigation -->
+      <div class="rooms-section">
+        <div class="section-title-row">
+          <span>ROOMS & CHANNELS</span>
+          <button class="add-room-btn" title="Create New Room" onclick="toggleCreateRoomModal(true)">+ New Room</button>
+        </div>
+
+        <div class="room-search-box">
+          <input type="text" id="roomSearchInput" placeholder="Filter rooms..." oninput="filterRoomsList()">
+        </div>
+
+        <div class="rooms-list" id="roomsListContainer">
+          <!-- Dynamically populated room items -->
+        </div>
+      </div>
+
+      <!-- Active Users Global Metric -->
+      <div class="sidebar-footer">
+        <div class="global-metric">
+          <span class="metric-icon">🟢</span>
+          <div class="metric-text">
+            <strong>Active Users Online: <span id="globalActiveCount">1</span></strong>
+            <small>Live server count</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Chat Area -->
+    <main class="chat-main">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="channel-info">
+          <span class="channel-hash">#</span>
+          <div>
+            <h3 id="currentRoomTitle">general</h3>
+            <p id="currentRoomDesc">General discussion for everyone</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="room-pill">
+            <span class="pill-dot"></span>
+            <span id="roomMemberCountText">1 Member</span>
+          </div>
+          <button class="btn btn-sm btn-outline" id="btnToggleInspector" onclick="toggleInspectorPanel()">
+            🔍 Classroom Event Inspector
+          </button>
+        </div>
+      </header>
+
+      <!-- Gyan Ki Baat Notice Bar (Original Server Event) -->
+      <div class="gyankibaat-banner" id="gyanKiBaatBanner">
+        <span class="gyan-icon">💡</span>
+        <div class="gyan-content">
+          <strong>Gyan Ki Baat from Server:</strong>
+          <span id="gyanKiBaatText">welcome to socket.io server</span>
+        </div>
+        <button class="banner-close" onclick="dismissGyanBanner()">✕</button>
+      </div>
+
+      <!-- Messages Stream -->
+      <div class="messages-container" id="messagesContainer">
+        <div class="channel-welcome-banner" id="roomWelcomeBanner">
+          <div class="welcome-icon">💬</div>
+          <h2 id="roomWelcomeTitle">Welcome to #general!</h2>
+          <p id="roomWelcomeDesc">This is the start of the #general channel. Connect and chat with fellow students!</p>
+        </div>
+
+        <!-- Chat messages dynamically rendered here -->
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator-bar" id="typingIndicatorBar">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="typing-text" id="typingText">Someone is typing...</span>
+      </div>
+
+      <!-- Message Input & Quick Classroom Event Bar -->
+      <div class="chat-input-wrapper">
+        <!-- Quick Classroom Test Bar -->
+        <div class="quick-test-bar">
+          <span class="quick-test-label">Classroom Events:</span>
+          <button class="test-pill" onclick="sendKuchbhiEvent('welcome to client side')">
+            🚀 Send 'kuchbhi' Event
+          </button>
+          <button class="test-pill" onclick="sendKuchbhiEvent('Testing Socket.IO event from ' + currentUsername)">
+            📡 Send Custom 'kuchbhi'
+          </button>
+          <span class="quick-test-note">Logs directly to server terminal!</span>
+        </div>
+
+        <form class="chat-input-form" id="chatForm" onsubmit="handleSendMessage(event)">
+          <div class="input-actions-left">
+            <div class="emoji-dropdown">
+              <button type="button" class="emoji-trigger-btn" id="emojiTriggerBtn" onclick="toggleEmojiPicker()">😊</button>
+              <div class="emoji-picker-popover hidden" id="emojiPickerPopover">
+                <span onclick="insertEmoji('😀')">😀</span>
+                <span onclick="insertEmoji('😂')">😂</span>
+                <span onclick="insertEmoji('❤️')">❤️</span>
+                <span onclick="insertEmoji('🔥')">🔥</span>
+                <span onclick="insertEmoji('👍')">👍</span>
+                <span onclick="insertEmoji('🎉')">🎉</span>
+                <span onclick="insertEmoji('🚀')">🚀</span>
+                <span onclick="insertEmoji('🧑‍💻')">🧑‍💻</span>
+                <span onclick="insertEmoji('🙌')">🙌</span>
+                <span onclick="insertEmoji('✨')">✨</span>
+              </div>
+            </div>
+          </div>
+
+          <textarea 
+            id="messageInput" 
+            class="chat-textarea" 
+            placeholder="Type your message to #general... (Press Enter to send)" 
+            rows="1"
+            onkeydown="handleInputKeydown(event)"
+            oninput="handleTyping()"></textarea>
+
+          <button type="submit" class="send-message-btn" id="btnSendMessage" title="Send Message">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR: Room Members & Classroom Events Inspector -->
+    <aside class="sidebar-right" id="sidebarRight">
+      <!-- Right Sidebar Tabs -->
+      <div class="right-tabs">
+        <button class="right-tab active" data-tab="members" onclick="switchRightTab('members')">
+          👥 Members (<span id="membersTabCount">1</span>)
+        </button>
+        <button class="right-tab" data-tab="inspector" onclick="switchRightTab('inspector')">
+          ⚡ Event Inspector
+        </button>
+      </div>
+
+      <!-- Tab 1: Room Members -->
+      <div class="right-tab-pane active" id="pane-members">
+        <div class="members-header">
+          <h4>ONLINE IN THIS ROOM</h4>
+        </div>
+        <div class="members-list" id="roomMembersList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab 2: Classroom Event Inspector -->
+      <div class="right-tab-pane" id="pane-inspector">
+        <div class="inspector-header">
+          <h4>SOCKET.IO EVENTS STREAM</h4>
+          <button class="btn btn-sm btn-outline" onclick="clearEventLogs()">Clear</button>
+        </div>
+        <p class="text-xs text-muted mb-xs">Live monitor for events from class backend code:</p>
+        <div class="events-terminal" id="eventsTerminal">
+          <!-- Populated dynamically with raw socket events -->
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
