@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://cdn.socket.io/4.8.4/socket.io.min.js"
+      integrity="sha384-fBrXvbDtHoeKWJ/hcA6M+YGueiDW+h45I7V6F2kD1S8bOkrF9rZYPLVkCR6BLR/1"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <h1>Welcome to socket.io client side</h1>
+  </body>
+</html>
+
+<script>
+  const socket = io("ws://localhost:8080/", {
+    transports: ["websocket"],
+  });
+
+  // sending
+  socket.emit("kuchbhi", "welcome to client side");
+
+  // reading
+  socket.on("gyaankibaat", (msg) => {
+    console.log("Message from server", msg);
+  });
+
+  // reading broadcast
+  socket.on("join", (msg) => {
+    console.log("Messsage from server", msg);
+  });
+
+  // reading announcement
+  socket.on("announcement", (msg) => {
+    console.log("Messsage from server", msg);
+  });
+</script>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Chat</title>
+<script src="https://cdn.socket.io/4.8.4/socket.io.min.js"
+  integrity="sha384-fBrXvbDtHoeKWJ/hcA6M+YGueiDW+h45I7V6F2kD1S8bOkrF9rZYPLVkCR6BLR/1"
+  crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #10333a; --ink-2: #1b4a53; --ink-text: #d6e6e8;
+    --bg: #edf2f3; --card: #ffffff; --line: #d3dde0; --text: #14262b; --muted: #5d7378;
+    --accent: #e8a33d; --danger: #b3412f;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: "Figtree", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  button, input { font: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { display: grid; grid-template-columns: 290px 1fr; height: 100%; }
+
+  /* sidebar */
+  aside { background: var(--ink); color: var(--ink-text); display: flex; flex-direction: column; min-height: 0; }
+  .me { padding: 18px 18px 14px; font-weight: 700; font-size: 18px; color: #fff; }
+  .me small { display: block; font-weight: 400; font-size: 13px; color: var(--ink-text); opacity: .75; }
+  .room-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+  .room-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    background: none; border: 0; color: inherit; text-align: left; padding: 10px 10px; border-radius: 8px; cursor: pointer; }
+  .room-btn:hover { background: var(--ink-2); }
+  .room-btn.active { background: var(--ink-2); box-shadow: inset 3px 0 0 var(--accent); color: #fff; }
+  .room-btn span.n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge { background: var(--accent); color: var(--ink); font-size: 12px; font-weight: 700; border-radius: 10px; padding: 1px 7px; }
+  .side-forms { padding: 14px 16px 18px; border-top: 1px solid var(--ink-2); display: grid; gap: 10px; }
+  .side-forms form { display: flex; gap: 6px; }
+  .side-forms input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--ink-2); background: #0b272d; color: #fff; }
+  .side-forms input::placeholder { color: #7f9ba0; }
+  .side-forms button { padding: 8px 12px; border-radius: 8px; border: 0; background: var(--accent); color: var(--ink); font-weight: 700; cursor: pointer; }
+
+  /* main */
+  main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  header { padding: 14px 22px; background: var(--card); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header h2 { margin: 0; font-size: 18px; }
+  header .meta { color: var(--muted); font-size: 14px; flex: 1; min-width: 160px; }
+  .chip { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 5px 10px; font-size: 13px; cursor: pointer; }
+  .chip.leave { color: var(--danger); }
+
+  #messages { flex: 1; overflow-y: auto; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: min(560px, 80%); padding: 8px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); align-self: flex-start; overflow-wrap: anywhere; }
+  .msg .who { font-size: 12px; font-weight: 700; color: var(--ink-2); margin-bottom: 2px; }
+  .msg .time { font-size: 11px; color: var(--muted); margin-left: 8px; font-weight: 400; }
+  .msg.mine { align-self: flex-end; background: var(--ink); color: #fff; border-color: var(--ink); }
+  .msg.mine .who, .msg.mine .time { color: #b8d2d6; }
+  .sys { align-self: center; font-size: 13px; color: var(--muted); }
+  .empty { margin: auto; color: var(--muted); text-align: center; }
+
+  #typing { height: 22px; padding: 0 24px; font-size: 13px; color: var(--muted); }
+  #composer { display: flex; gap: 10px; padding: 12px 22px 18px; }
+  #composer input { flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); }
+  #composer button { padding: 0 22px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; font-weight: 700; cursor: pointer; }
+
+  /* login + toast */
+  #login { position: fixed; inset: 0; background: var(--ink); display: grid; place-items: center; z-index: 10; padding: 20px; }
+  #login form { background: var(--card); padding: 28px; border-radius: 14px; width: min(380px, 100%); display: grid; gap: 12px; }
+  #login h1 { margin: 0; font-size: 24px; }
+  #login p { margin: 0; color: var(--muted); }
+  #login input { padding: 12px; border-radius: 10px; border: 1px solid var(--line); }
+  #login button { padding: 12px; border: 0; border-radius: 10px; background: var(--accent); color: var(--ink); font-weight: 700; cursor: pointer; }
+  #status { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: var(--danger); color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 14px; z-index: 20; display: none; }
+
+  @media (max-width: 720px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    aside { max-height: 40vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="status"></div>
+
+<div id="login">
+  <form id="loginForm">
+    <h1>Class Chat</h1>
+    <p>Pick a name to join the lobby.</p>
+    <input id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off" required>
+    <button type="submit">Join chat</button>
+  </form>
+</div>
+
+<div class="app">
+  <aside>
+    <div class="me"><span id="meName">…</span><small id="meState">Connecting…</small></div>
+    <div class="room-list" id="roomList"></div>
+    <div class="side-forms">
+      <form id="createForm"><input id="createInput" maxlength="30" placeholder="New room name"><button>Create</button></form>
+      <form id="joinForm"><input id="joinInput" maxlength="6" placeholder="Room code"><button>Join</button></form>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <h2 id="roomTitle">Lobby</h2>
+      <div class="meta" id="roomMeta"></div>
+      <button class="chip" id="copyBtn" hidden>Copy code</button>
+      <button class="chip leave" id="leaveBtn" hidden>Leave room</button>
+    </header>
+    <div id="messages"></div>
+    <div id="typing"></div>
+    <form id="composer">
+      <input id="msgInput" maxlength="500" placeholder="Type a message" autocomplete="off">
+      <button>Send</button>
+    </form>
+  </main>
+</div>
+
+<script>
+  // Same connection settings as the original client.html
+  const socket = io("ws://localhost:8080/", { transports: ["websocket"] });
+
+  // Original listeners from class, kept as they were
+  socket.on("gyankibaat", (msg) => console.log("Message from server", msg));
+  socket.on("join", (msg) => console.log("Message from server", msg));
+  socket.on("announcement", (msg) => console.log("Message from server", msg));
+
+  const $ = (id) => document.getElementById(id);
+  const rooms = new Map();   // code -> { name, messages: [], members: [], unread: 0 }
+  let me = null, active = "LOBBY", typingTimer = null, lastTypingSent = 0;
+
+  // ---------- connection state ----------
+  const status = $("status");
+  socket.on("connect", () => {
+    status.style.display = "none"; $("meState").textContent = "Online";
+    if (me) socket.emit("user:login", me); // re-login after a reconnect
+  });
+  socket.on("disconnect", () => { $("meState").textContent = "Offline"; rooms.clear(); });
+  socket.on("connect_error", () => showStatus("Cannot reach server on localhost:8080. Is it running?"));
+  socket.on("app:error", showStatus);
+  function showStatus(t) { status.textContent = t; status.style.display = "block"; setTimeout(() => status.style.display = "none", 4000); }
+
+  // ---------- login ----------
+  $("loginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    me = $("nameInput").value.trim();
+    if (me) socket.emit("user:login", me);
+  });
+  socket.on("user:ready", ({ name }) => { me = name; $("meName").textContent = name; $("login").style.display = "none"; $("msgInput").focus(); });
+
+  // ---------- room events ----------
+  socket.on("room:joined", ({ code, name, history }) => {
+    rooms.set(code, { name, messages: history.slice(), members: [], unread: 0 });
+    active = code; render();
+  });
+  socket.on("room:members", ({ room, members }) => {
+    const r = rooms.get(room); if (!r) return;
+    r.members = members; if (room === active) renderHeader(); 
+  });
+  socket.on("chat:message", (m) => {
+    const r = rooms.get(m.room); if (!r) return;
+    const last = r.messages[r.messages.length - 1];
+    if (!last || last.ts !== m.ts || last.text !== m.text) r.messages.push(m);
+    if (m.room === active) { renderMessages(); } else if (!m.system) { r.unread++; renderRooms(); }
+  });
+  socket.on("chat:typing", ({ room, user }) => {
+    if (room !== active) return;
+    $("typing").textContent = `${user} is typing…`;
+    clearTimeout(typingTimer); typingTimer = setTimeout(() => $("typing").textContent = "", 1500);
+  });
+
+  // ---------- user actions ----------
+  $("createForm").addEventListener("submit", (e) => { e.preventDefault(); socket.emit("room:create", $("createInput").value); $("createInput").value = ""; });
+  $("joinForm").addEventListener("submit", (e) => { e.preventDefault(); const c = $("joinInput").value.trim(); if (c) socket.emit("room:join", c); $("joinInput").value = ""; });
+  $("leaveBtn").addEventListener("click", () => { socket.emit("room:leave", active); rooms.delete(active); active = "LOBBY"; render(); });
+  $("copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(active); $("copyBtn").textContent = "Copied"; } catch { $("copyBtn").textContent = active; }
+    setTimeout(() => $("copyBtn").textContent = "Copy code", 1500);
+  });
+  $("composer").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("msgInput").value.trim(); if (!text) return;
+    socket.emit("chat:message", { room: active, text }); $("msgInput").value = "";
+  });
+  $("msgInput").addEventListener("input", () => {
+    if (Date.now() - lastTypingSent > 1000) { socket.emit("chat:typing", active); lastTypingSent = Date.now(); }
+  });
+
+  // ---------- rendering (textContent only, so message text is never treated as HTML) ----------
+  function render() { renderRooms(); renderHeader(); renderMessages(); }
+
+  function renderRooms() {
+    const list = $("roomList"); list.replaceChildren();
+    for (const [code, r] of rooms) {
+      const b = document.createElement("button");
+      b.className = "room-btn" + (code === active ? " active" : "");
+      const n = document.createElement("span"); n.className = "n"; n.textContent = r.name; b.append(n);
+      if (r.unread) { const u = document.createElement("span"); u.className = "badge"; u.textContent = r.unread; b.append(u); }
+      b.addEventListener("click", () => { active = code; r.unread = 0; $("typing").textContent = ""; render(); });
+      list.append(b);
+    }
+  }
+
+  function renderHeader() {
+    const r = rooms.get(active); if (!r) return;
+    $("roomTitle").textContent = r.name;
+    $("roomMeta").textContent = r.members.length + (r.members.length === 1 ? " person: " : " people: ") + r.members.join(", ");
+    const personal = active !== "LOBBY";
+    $("copyBtn").hidden = !personal; $("leaveBtn").hidden = !personal;
+    if (personal) $("copyBtn").title = "Share code " + active;
+  }
+
+  function renderMessages() {
+    const box = $("messages"); const r = rooms.get(active); box.replaceChildren();
+    if (!r) return;
+    if (!r.messages.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "No messages yet. Say hello."; box.append(e); return; }
+    for (const m of r.messages) {
+      const d = document.createElement("div");
+      if (m.system) { d.className = "sys"; d.textContent = m.text; box.append(d); continue; }
+      d.className = "msg" + (m.user === me ? " mine" : "");
+      const who = document.createElement("div"); who.className = "who"; who.textContent = m.user;
+      const t = document.createElement("span"); t.className = "time";
+      t.textContent = new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); who.append(t);
+      const body = document.createElement("div"); body.textContent = m.text;
+      d.append(who, body); box.append(d);
+    }
+    box.scrollTop = box.scrollHeight;
+  }
+</script>
+</body>
+</html>

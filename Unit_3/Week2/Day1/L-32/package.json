@@ -1,0 +1,22 @@
+{
+  "name": "l-32",
+  "version": "1.0.0",
+  "description": "Lecture 32 - Express Server with MongoDB connection",
+  "main": "1.js",
+  "scripts": {
+    "start": "node 1.js",
+    "server": "nodemon 1.js",
+    "dev": "nodemon 1.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
