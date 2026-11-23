@@ -7,16 +7,25 @@
 
 ## 📋 Table of Contents
 1. [Project Overview](#-project-overview)
-2. [Mandatory Syllabus Requirements Compliance](#-mandatory-syllabus-requirements-compliance)
-3. [Technology Stack](#-technology-stack)
-4. [System Architecture (MVC)](#-system-architecture-mvc)
-5. [Database Schemas & Indexing](#-database-schemas--indexing)
-6. [Unique Twist: Click Analytics Aggregations](#-unique-twist-click-analytics-aggregations)
-7. [Authentication & RBAC](#-authentication--rbac)
-8. [REST API Specification](#-rest-api-specification)
-9. [Postman Collection](#-postman-collection)
-10. [Frontend Architecture](#-frontend-architecture)
-11. [Getting Started (Step-by-Step)](#-getting-started-step-by-step)
+2. [Submission Video Link](#-submission-video-link)
+3. [Mandatory Syllabus Requirements Compliance](#-mandatory-syllabus-requirements-compliance)
+4. [Technology Stack](#-technology-stack)
+5. [System Architecture (MVC)](#-system-architecture-mvc)
+6. [Database Schemas & Indexing](#-database-schemas--indexing)
+7. [Unique Twist: Click Analytics Aggregations](#-unique-twist-click-analytics-aggregations)
+8. [Authentication & RBAC](#-authentication--rbac)
+9. [REST API Specification](#-rest-api-specification)
+10. [Postman Collection](#-postman-collection)
+11. [Frontend Architecture](#-frontend-architecture)
+12. [Getting Started (Step-by-Step)](#-getting-started-step-by-step)
+
+---
+
+## 🎥 Submission Video Link
+
+- **Google Drive Video (Code Walkthrough):** [https://drive.google.com/file/d/11C7Q79iYXWYDj-ouyrPj399cAGI1m_lv/view?usp=drivesdk](https://drive.google.com/file/d/11C7Q79iYXWYDj-ouyrPj399cAGI1m_lv/view?usp=drivesdk)
+- **Video Description:** Complete walkthrough of all 27 project source files across MVC Backend and React Frontend with all green comments removed.
+- **Interactive Player:** [http://localhost:5173/code_video.html](http://localhost:5173/code_video.html)
 
 ---
 
