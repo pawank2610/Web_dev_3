@@ -5,11 +5,6 @@ const {
   verifyRefreshToken,
 } = require('../utils/tokenHelper');
 
-/**
- * @desc    Register a new user
- * @route   POST /api/auth/register
- * @access  Public
- */
 const register = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
@@ -21,7 +16,6 @@ const register = async (req, res, next) => {
       });
     }
 
-    // Check if user already exists
     const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       return res.status(409).json({
@@ -30,7 +24,6 @@ const register = async (req, res, next) => {
       });
     }
 
-    // Assign role (can default to user; supports admin if specified for initial setup)
     const userRole = role === 'admin' ? 'admin' : 'user';
 
     const user = await User.create({
@@ -40,11 +33,9 @@ const register = async (req, res, next) => {
       role: userRole,
     });
 
-    // Generate Tokens
     const accessToken = generateAccessToken({ id: user._id, role: user.role });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    // Store refreshToken in DB
     user.refreshToken = refreshToken;
     await user.save();
 
@@ -65,11 +56,6 @@ const register = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Authenticate user & get tokens
- * @route   POST /api/auth/login
- * @access  Public
- */
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -81,7 +67,6 @@ const login = async (req, res, next) => {
       });
     }
 
-    // Find user (with password)
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({
@@ -90,7 +75,6 @@ const login = async (req, res, next) => {
       });
     }
 
-    // Verify password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -99,11 +83,9 @@ const login = async (req, res, next) => {
       });
     }
 
-    // Generate Tokens
     const accessToken = generateAccessToken({ id: user._id, role: user.role });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    // Save refresh token
     user.refreshToken = refreshToken;
     await user.save();
 
@@ -124,11 +106,6 @@ const login = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Renew access token using refresh token
- * @route   POST /api/auth/refresh
- * @access  Public (Requires valid refresh token)
- */
 const refreshSession = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
@@ -140,7 +117,6 @@ const refreshSession = async (req, res, next) => {
       });
     }
 
-    // Verify token
     let decoded;
     try {
       decoded = verifyRefreshToken(refreshToken);
@@ -151,7 +127,6 @@ const refreshSession = async (req, res, next) => {
       });
     }
 
-    // Find user by id and matching refreshToken in DB
     const user = await User.findById(decoded.id);
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(401).json({
@@ -160,7 +135,6 @@ const refreshSession = async (req, res, next) => {
       });
     }
 
-    // Issue new access token
     const newAccessToken = generateAccessToken({ id: user._id, role: user.role });
 
     res.status(200).json({
@@ -172,11 +146,6 @@ const refreshSession = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Log out user & invalidate refresh token
- * @route   POST /api/auth/logout
- * @access  Private
- */
 const logout = async (req, res, next) => {
   try {
     if (req.user) {
@@ -196,11 +165,6 @@ const logout = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get current user profile
- * @route   GET /api/auth/me
- * @access  Private
- */
 const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);

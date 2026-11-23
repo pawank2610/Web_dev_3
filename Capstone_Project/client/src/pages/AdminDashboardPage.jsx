@@ -20,7 +20,6 @@ export const AdminDashboardPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Moderation state
   const [blockingId, setBlockingId] = useState(null);
   const [blockReason, setBlockReason] = useState('');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -50,7 +49,6 @@ export const AdminDashboardPage = () => {
 
   const handleToggleBlock = async (link) => {
     if (link.isBlocked) {
-      // Unblock directly
       if (!window.confirm(`Unblock link /${link.shortCode}?`)) return;
       try {
         await api.updateLinkStatus(link._id, { isBlocked: false, blockReason: '' });
@@ -59,7 +57,6 @@ export const AdminDashboardPage = () => {
         alert(err.message || 'Failed to unblock link');
       }
     } else {
-      // Prompt for block reason
       setBlockingId(link._id);
       setBlockReason('Phishing, malware, or inappropriate destination URL');
     }

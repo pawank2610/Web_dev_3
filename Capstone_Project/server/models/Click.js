@@ -45,9 +45,7 @@ const clickSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for fast aggregation by link and timestamp
 clickSchema.index({ linkId: 1, timestamp: -1 });
-// Compound index for fast aggregation by link and device type
 clickSchema.index({ linkId: 1, deviceType: 1 });
 
 module.exports = mongoose.model('Click', clickSchema);

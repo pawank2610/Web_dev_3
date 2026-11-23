@@ -3,11 +3,6 @@ const Link = require('../models/Link');
 const User = require('../models/User');
 const Click = require('../models/Click');
 
-/**
- * @desc    Get all links across the platform (Admin only)
- * @route   GET /api/admin/links
- * @access  Private/Admin
- */
 const getAllLinks = async (req, res, next) => {
   try {
     const { search, status, page = 1, limit = 20 } = req.query;
@@ -57,11 +52,6 @@ const getAllLinks = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Block or Unblock a link (Admin only)
- * @route   PATCH /api/admin/links/:id/status
- * @access  Private/Admin
- */
 const updateLinkStatus = async (req, res, next) => {
   try {
     const { isBlocked, blockReason } = req.body;
@@ -91,16 +81,10 @@ const updateLinkStatus = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get all registered users (Admin only)
- * @route   GET /api/admin/users
- * @access  Private/Admin
- */
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().select('-refreshToken').sort({ createdAt: -1 });
 
-    // Count links per user using aggregation
     const userLinkCounts = await Link.aggregate([
       { $group: { _id: '$createdBy', totalLinks: { $sum: 1 }, totalClicks: { $sum: '$clicksCount' } } },
     ]);
@@ -129,11 +113,6 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get platform-wide overview statistics using aggregation (Admin only)
- * @route   GET /api/admin/stats
- * @access  Private/Admin
- */
 const getSystemStats = async (req, res, next) => {
   try {
     const totalUsers = await User.countDocuments();
@@ -141,7 +120,6 @@ const getSystemStats = async (req, res, next) => {
     const blockedLinks = await Link.countDocuments({ isBlocked: true });
     const totalClicks = await Click.countDocuments();
 
-    // Aggregation: Platform-wide device distribution
     const systemDeviceStats = await Click.aggregate([
       {
         $group: {
@@ -159,7 +137,6 @@ const getSystemStats = async (req, res, next) => {
       },
     ]);
 
-    // Top 5 most clicked links
     const topLinks = await Link.find()
       .populate('createdBy', 'name email')
       .sort({ clicksCount: -1 })

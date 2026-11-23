@@ -2,16 +2,10 @@ const Link = require('../models/Link');
 const Click = require('../models/Click');
 const { parseUserAgent } = require('../utils/deviceHelper');
 
-/**
- * @desc    Redirect short code to original URL and record click analytics
- * @route   GET /:code
- * @access  Public
- */
 const handleRedirect = async (req, res, next) => {
   try {
     const { code } = req.params;
 
-    // Ignore requests for favicon, robots.txt, or api routes
     if (!code || ['favicon.ico', 'robots.txt', 'api', 'health'].includes(code.toLowerCase())) {
       return next();
     }
@@ -45,7 +39,6 @@ const handleRedirect = async (req, res, next) => {
       `);
     }
 
-    // 1. Check if link is blocked by admin
     if (link.isBlocked) {
       return res.status(403).send(`
         <!DOCTYPE html>
@@ -72,7 +65,6 @@ const handleRedirect = async (req, res, next) => {
       `);
     }
 
-    // 2. Check if link is expired
     if (link.isExpired()) {
       return res.status(410).send(`
         <!DOCTYPE html>
@@ -97,10 +89,8 @@ const handleRedirect = async (req, res, next) => {
       `);
     }
 
-    // 3. Increment click count atomically
     await Link.findByIdAndUpdate(link._id, { $inc: { clicksCount: 1 } });
 
-    // 4. Asynchronously log click details for analytics
     const rawUa = req.headers['user-agent'] || '';
     const { deviceType, browser, os } = parseUserAgent(rawUa);
     const ipAddress = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').split(',')[0].trim();
@@ -119,7 +109,6 @@ const handleRedirect = async (req, res, next) => {
       console.error('[Click Analytics Error]', err.message);
     });
 
-    // 5. Perform HTTP 302 redirect
     return res.redirect(302, link.originalUrl);
   } catch (error) {
     next(error);

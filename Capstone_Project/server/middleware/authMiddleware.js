@@ -1,9 +1,6 @@
 const { verifyAccessToken } = require('../utils/tokenHelper');
 const User = require('../models/User');
 
-/**
- * Authentication Middleware: Protects routes by verifying Bearer JWT
- */
 const protect = async (req, res, next) => {
   let token;
 
@@ -23,7 +20,6 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = verifyAccessToken(token);
-    // Find user by decoded ID
     const user = await User.findById(decoded.id).select('-refreshToken');
 
     if (!user) {
@@ -50,10 +46,6 @@ const protect = async (req, res, next) => {
   }
 };
 
-/**
- * Role-Based Access Control (RBAC) Middleware
- * Restricts access to specific roles (e.g. 'admin')
- */
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {

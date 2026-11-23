@@ -23,7 +23,6 @@ export const DashboardPage = () => {
   const [search, setSearch] = useState('');
   const [copiedId, setCopiedId] = useState(null);
 
-  // Modals state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedAnalyticsId, setSelectedAnalyticsId] = useState(null);
 

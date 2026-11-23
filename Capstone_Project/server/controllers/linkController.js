@@ -3,18 +3,10 @@ const mongoose = require('mongoose');
 const Link = require('../models/Link');
 const Click = require('../models/Click');
 
-/**
- * Generate cryptographic random alphanumeric short code
- */
 const generateShortCode = (length = 7) => {
   return crypto.randomBytes(length).toString('base64url').slice(0, length);
 };
 
-/**
- * @desc    Create a new short link (random crypto code or custom alias)
- * @route   POST /api/links
- * @access  Private
- */
 const createLink = async (req, res, next) => {
   try {
     const { originalUrl, alias, expiresAt } = req.body;
@@ -26,7 +18,6 @@ const createLink = async (req, res, next) => {
       });
     }
 
-    // Ensure valid URL prefix
     let targetUrl = originalUrl.trim();
     if (!/^https?:\/\//i.test(targetUrl)) {
       targetUrl = `https://${targetUrl}`;
@@ -36,7 +27,6 @@ const createLink = async (req, res, next) => {
 
     if (alias && alias.trim()) {
       const cleanedAlias = alias.trim().toLowerCase();
-      // Validate alias format (alphanumeric, dashes, underscores)
       if (!/^[a-zA-Z0-9-_]{3,30}$/.test(cleanedAlias)) {
         return res.status(400).json({
           success: false,
@@ -44,7 +34,6 @@ const createLink = async (req, res, next) => {
         });
       }
 
-      // Check if alias or shortCode is already taken
       const existing = await Link.findOne({
         $or: [{ shortCode: cleanedAlias }, { alias: cleanedAlias }],
       });
@@ -57,7 +46,6 @@ const createLink = async (req, res, next) => {
 
       shortCode = cleanedAlias;
     } else {
-      // Generate unique crypto short code
       let isUnique = false;
       let attempts = 0;
       while (!isUnique && attempts < 5) {
@@ -70,7 +58,6 @@ const createLink = async (req, res, next) => {
       }
     }
 
-    // Expiration date
     let expirationDate = null;
     if (expiresAt) {
       const exp = new Date(expiresAt);
@@ -106,11 +93,6 @@ const createLink = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get all links created by the authenticated user
- * @route   GET /api/links
- * @access  Private
- */
 const getUserLinks = async (req, res, next) => {
   try {
     const { search } = req.query;
@@ -144,11 +126,6 @@ const getUserLinks = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get single link details by ID
- * @route   GET /api/links/:id
- * @access  Private
- */
 const getLinkById = async (req, res, next) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -160,7 +137,6 @@ const getLinkById = async (req, res, next) => {
       });
     }
 
-    // Verify ownership or admin access
     if (
       link.createdBy.toString() !== req.user._id.toString() &&
       req.user.role !== 'admin'
@@ -186,11 +162,6 @@ const getLinkById = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Delete a link & associated click records
- * @route   DELETE /api/links/:id
- * @access  Private
- */
 const deleteLink = async (req, res, next) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -202,7 +173,6 @@ const deleteLink = async (req, res, next) => {
       });
     }
 
-    // Check ownership or admin
     if (
       link.createdBy.toString() !== req.user._id.toString() &&
       req.user.role !== 'admin'
@@ -225,13 +195,6 @@ const deleteLink = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Get comprehensive analytics for a link using MongoDB Aggregation Pipelines
- * @route   GET /api/links/:id/analytics
- * @access  Private
- *
- * MANDATORY REQUIREMENT: Aggregation Pipeline by day & by device type
- */
 const getLinkAnalytics = async (req, res, next) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -255,7 +218,6 @@ const getLinkAnalytics = async (req, res, next) => {
 
     const linkObjectId = new mongoose.Types.ObjectId(link._id);
 
-    // 1. Aggregation Pipeline: Clicks grouped by Day (YYYY-MM-DD)
     const clicksByDay = await Click.aggregate([
       { $match: { linkId: linkObjectId } },
       {
@@ -276,7 +238,6 @@ const getLinkAnalytics = async (req, res, next) => {
       },
     ]);
 
-    // 2. Aggregation Pipeline: Clicks grouped by Device Type (Mobile, Desktop, Tablet, Other)
     const clicksByDevice = await Click.aggregate([
       { $match: { linkId: linkObjectId } },
       {
@@ -295,7 +256,6 @@ const getLinkAnalytics = async (req, res, next) => {
       },
     ]);
 
-    // 3. Aggregation Pipeline: Clicks grouped by Browser
     const clicksByBrowser = await Click.aggregate([
       { $match: { linkId: linkObjectId } },
       {
@@ -314,7 +274,6 @@ const getLinkAnalytics = async (req, res, next) => {
       },
     ]);
 
-    // 4. Aggregation Pipeline: Clicks grouped by Operating System
     const clicksByOS = await Click.aggregate([
       { $match: { linkId: linkObjectId } },
       {
@@ -333,7 +292,6 @@ const getLinkAnalytics = async (req, res, next) => {
       },
     ]);
 
-    // 5. Recent Clicks (last 10 events)
     const recentClicks = await Click.find({ linkId: linkObjectId })
       .sort({ timestamp: -1 })
       .limit(10)

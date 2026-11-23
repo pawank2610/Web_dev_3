@@ -9,7 +9,6 @@ const {
 } = require('../controllers/linkController');
 const { protect } = require('../middleware/authMiddleware');
 
-// All link routes require authentication
 router.use(protect);
 
 router.route('/')
@@ -20,7 +19,6 @@ router.route('/:id')
   .get(getLinkById)
   .delete(deleteLink);
 
-// Aggregation analytics endpoint
 router.get('/:id/analytics', getLinkAnalytics);
 
 module.exports = router;

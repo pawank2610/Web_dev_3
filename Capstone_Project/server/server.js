@@ -4,15 +4,12 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const { notFoundHandler, errorHandler } = require('./middleware/errorMiddleware');
 
-// Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// Enable Cross-Origin Resource Sharing
 app.use(
   cors({
     origin: '*',
@@ -21,11 +18,9 @@ app.use(
   })
 );
 
-// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health Check Endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'online',
@@ -34,15 +29,12 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/links', require('./routes/linkRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
-// Short Code Redirection Route (e.g. GET /abc1234)
 app.use('/', require('./routes/redirectRoutes'));
 
-// Centralized Error-Handling Middleware
 app.use(notFoundHandler);
 app.use(errorHandler);
 
@@ -56,7 +48,6 @@ const server = app.listen(PORT, () => {
   console.log(`====================================================`);
 });
 
-// Handle unhandled promise rejections gracefully
 process.on('unhandledRejection', (err) => {
   console.error(`[Unhandled Rejection] ${err.message}`);
 });

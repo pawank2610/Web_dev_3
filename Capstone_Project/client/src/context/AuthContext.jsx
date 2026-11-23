@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore stored user session on initial mount
   useEffect(() => {
     const initAuth = async () => {
       const { accessToken } = getStoredTokens();
@@ -16,7 +15,6 @@ export const AuthProvider = ({ children }) => {
       if (accessToken && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
-          // Verify with backend silently
           const res = await api.getProfile();
           if (res.user) {
             setUser(res.user);
@@ -52,7 +50,6 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.logout();
     } catch (e) {
-      // Ignore network errors on logout
     } finally {
       setUser(null);
       clearStoredTokens();

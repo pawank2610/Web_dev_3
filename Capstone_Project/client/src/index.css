@@ -1,6 +1,3 @@
-/* ==========================================================================
-   SHORTLINK DESIGN SYSTEM - MODERN DEVELOPER THEME (ZINC / PRECISION)
-   ========================================================================== */
 
 :root {
   --bg-app: #09090b;
@@ -56,7 +53,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography Helpers */
 h1, h2, h3, h4 {
   font-weight: 600;
   color: var(--text-primary);
@@ -72,7 +68,6 @@ code, pre {
   font-family: var(--font-mono);
 }
 
-/* Layout Utilities */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -87,7 +82,6 @@ code, pre {
   padding: 2rem 1.5rem 4rem;
 }
 
-/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -156,7 +150,6 @@ code, pre {
   border-color: var(--border-strong);
 }
 
-/* Form Inputs */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -193,7 +186,6 @@ code, pre {
   color: var(--text-muted);
 }
 
-/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -236,7 +228,6 @@ code, pre {
   border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
-/* Modal Backdrop & Container */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -295,7 +286,6 @@ code, pre {
   background-color: rgba(24, 24, 27, 0.5);
 }
 
-/* Card Component */
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -303,7 +293,6 @@ code, pre {
   padding: 1.5rem;
 }
 
-/* Toast/Alert Banners */
 .alert {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
@@ -326,7 +315,6 @@ code, pre {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* Modern Tables */
 .table-wrapper {
   overflow-x: auto;
   border: 1px solid var(--border-subtle);
@@ -366,7 +354,6 @@ code, pre {
   background-color: var(--bg-card-hover);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .main-content {
     padding: 1.25rem 1rem 3rem;

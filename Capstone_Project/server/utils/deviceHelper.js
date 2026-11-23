@@ -1,11 +1,6 @@
-/**
- * Device & User-Agent parser utility
- * Extracts Device Type (Desktop, Mobile, Tablet, Other), OS, and Browser
- */
 const parseUserAgent = (uaString = '') => {
   const ua = uaString.toLowerCase();
 
-  // 1. Device Type
   let deviceType = 'Desktop';
   if (/ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk/i.test(ua)) {
     deviceType = 'Tablet';
@@ -15,7 +10,6 @@ const parseUserAgent = (uaString = '') => {
     deviceType = 'Other';
   }
 
-  // 2. Browser
   let browser = 'Unknown';
   if (/edg\//i.test(ua)) {
     browser = 'Edge';
@@ -31,7 +25,6 @@ const parseUserAgent = (uaString = '') => {
     browser = 'Postman';
   }
 
-  // 3. Operating System
   let os = 'Unknown';
   if (/windows/i.test(ua)) {
     os = 'Windows';

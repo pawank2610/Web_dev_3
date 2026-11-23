@@ -54,10 +54,8 @@ const linkSchema = new mongoose.Schema(
   }
 );
 
-// Compound Index: Optimize user dashboard queries for recent links
 linkSchema.index({ createdBy: 1, createdAt: -1 });
 
-// Helper to check if link is expired
 linkSchema.methods.isExpired = function () {
   if (!this.expiresAt) return false;
   return new Date() > new Date(this.expiresAt);

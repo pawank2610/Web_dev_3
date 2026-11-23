@@ -1,7 +1,3 @@
-/**
- * ShortLink Fetch API Client
- * Includes automatic Bearer JWT attachment & seamless Refresh Token rotation
- */
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -52,7 +48,6 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
     headers,
   });
 
-  // Handle Token Expiry & Automatic Refresh Interceptor
   if (res.status === 401 && refreshToken && !endpoint.includes('/auth/')) {
     if (!isRefreshing) {
       isRefreshing = true;
@@ -83,7 +78,6 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
       }
     }
 
-    // Wait for ongoing refresh to complete and retry
     const retryPromise = new Promise((resolve) => {
       subscribeTokenRefresh((newAccessToken) => {
         headers['Authorization'] = `Bearer ${newAccessToken}`;
@@ -111,9 +105,7 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
   return data;
 };
 
-// API Services Object
 export const api = {
-  // Auth
   register: (payload) =>
     fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
@@ -139,16 +131,13 @@ export const api = {
   logout: () => fetchWithAuth('/auth/logout', { method: 'POST' }),
   getProfile: () => fetchWithAuth('/auth/me'),
 
-  // Links CRUD (Protected)
   createLink: (payload) => fetchWithAuth('/links', { method: 'POST', body: JSON.stringify(payload) }),
   getUserLinks: (search = '') => fetchWithAuth(`/links${search ? `?search=${encodeURIComponent(search)}` : ''}`),
   getLinkById: (id) => fetchWithAuth(`/links/${id}`),
   deleteLink: (id) => fetchWithAuth(`/links/${id}`, { method: 'DELETE' }),
 
-  // Link Analytics (Aggregation Pipeline)
   getLinkAnalytics: (id) => fetchWithAuth(`/links/${id}/analytics`),
 
-  // RBAC Admin
   getAdminLinks: ({ search = '', status = '', page = 1, limit = 20 } = {}) => {
     const params = new URLSearchParams({ page, limit });
     if (search) params.append('search', search);
