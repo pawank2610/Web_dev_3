@@ -1,7 +1,3 @@
-// ==========================================================================
-// UNSLOPPED CLEAN CHAT CLIENT SCRIPT (LINEAR / VERCEL INSPIRED)
-// High-Reliability Socket.IO Client for Web Dev III Assignment 4
-// ==========================================================================
 
 const socket = io();
 
