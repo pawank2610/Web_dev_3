@@ -3,432 +3,413 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Telegram Web</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='120' fill='%232AABEE'/%3E%3Cpath d='M54.3 118.8c34.9-15.2 58.2-25.2 69.9-30.1 33.3-13.9 40.2-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.6 2.4 1.7 3.4.2 1 0 2.4-.2 3.8-2.6 27.4-13.9 94-19.6 124.6-2.4 13-7.2 17.3-11.8 17.8-10.1 1-17.7-6.5-27.5-12.9-15.3-10-23.9-16.3-38.8-26.1-17.2-11.3-6.1-17.5 3.8-27.7 2.6-2.7 47.3-43.4 48.2-47.2.1-.5.2-2.3-.9-3.2-1.1-.9-2.7-.6-3.8-.3-1.6.4-27.7 17.6-78.1 51.6-7.4 5.1-14.1 7.6-20.1 7.5-6.6-.2-19.3-3.8-28.7-6.8-11.6-3.8-20.8-5.8-20-12.2.4-3.4 5.1-6.9 14-10.6z' fill='%23fff'/%3E%3C/svg%3E">
+  <title>OmniChat – The Social Messenger (WhatsApp • Instagram • Telegram)</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23833ab4'/%3E%3Cstop offset='50%25' stop-color='%23fd1d1d'/%3E%3Cstop offset='100%25' stop-color='%23fcb045'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='28' fill='url(%23g)'/%3E%3Cpath d='M30 48c0-11 9-20 20-20s20 9 20 20c0 10-7 18-17 19.7v7.3l-7.5-5.2C36 68 30 58.7 30 48z' fill='%23fff'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body class="theme-dark">
-  <!-- Telegram App Container -->
-  <div class="tg-app" id="telegramApp">
-    
-    <!-- LEFT COLUMN: Dialogs / Chats List -->
-    <aside class="tg-sidebar" id="sidebar">
-      
-      <!-- Top Bar: Burger Menu + Search -->
-      <div class="tg-top-bar">
-        <button class="tg-icon-btn" id="btnBurger" title="Menu" onclick="toggleDrawer(true)">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-          </svg>
-        </button>
+  <div class="omni-app" id="omniApp">
 
-        <div class="tg-search-wrapper">
-          <svg class="tg-search-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-          </svg>
-          <input type="text" id="chatSearchInput" class="tg-search-input" placeholder="Search" oninput="handleSearchChats()">
-          <button class="tg-search-clear hidden" id="btnSearchClear" onclick="clearSearch()">✕</button>
+    <!-- LEFT SIDEBAR: Navigation, Stories, Channels & Chats -->
+    <aside class="omni-sidebar" id="sidebar">
+
+      <!-- App Header: Branding + Action Icons -->
+      <div class="sidebar-header">
+        <div class="brand-badge">
+          <div class="brand-gradient-logo">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.18-1.32C8.6 21.52 10.25 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+            </svg>
+          </div>
+          <div class="brand-title-wrap">
+            <h2>OmniChat</h2>
+            <span class="hybrid-tag">WA • IG • TG</span>
+          </div>
+        </div>
+
+        <div class="header-tools">
+          <button class="tool-btn" id="btnThemeToggle" title="Toggle Theme" onclick="toggleAppTheme()">🌙</button>
+          <button class="tool-btn" title="Classroom Event Monitor" onclick="openClassroomMonitor()">📡</button>
+          <button class="tool-btn" title="My Profile" onclick="openProfileModal()">👤</button>
         </div>
       </div>
 
-      <!-- Telegram Folder Tabs -->
-      <div class="tg-tabs">
-        <button class="tg-tab active" data-folder="all" onclick="switchFolder('all')">
-          <span>All</span>
-          <span class="tg-tab-badge" id="allChatsBadge">4</span>
+      <!-- INSTAGRAM-STYLE STORIES / STATUS CAROUSEL -->
+      <div class="stories-wrapper">
+        <div class="stories-scroll" id="storiesScroll">
+          <!-- "Your Story" item -->
+          <div class="story-item" onclick="openMyStory()">
+            <div class="story-ring unread my-story" id="myStoryRing">
+              <div class="story-avatar" id="myStoryAvatar">PK</div>
+              <span class="story-add-badge">+</span>
+            </div>
+            <span class="story-name">Your Story</span>
+          </div>
+          <!-- Live stories populated via JS -->
+          <div id="dynamicStoriesList" class="dynamic-stories-row"></div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP-STYLE TAB NAVIGATION -->
+      <div class="omni-tabs">
+        <button class="omni-tab active" data-tab="all" onclick="filterChats('all')">
+          <span>All Chats</span>
+          <span class="tab-badge" id="badgeAllChats">4</span>
         </button>
-        <button class="tg-tab" data-folder="groups" onclick="switchFolder('groups')">
+        <button class="omni-tab" data-tab="groups" onclick="filterChats('groups')">
           <span>Groups</span>
         </button>
-        <button class="tg-tab" data-folder="channels" onclick="switchFolder('channels')">
+        <button class="omni-tab" data-tab="channels" onclick="filterChats('channels')">
           <span>Channels</span>
         </button>
-        <button class="tg-tab" data-folder="college" onclick="switchFolder('college')">
-          <span>College</span>
+        <button class="omni-tab" data-tab="saved" onclick="filterChats('saved')">
+          <span>Saved</span>
         </button>
       </div>
 
-      <!-- Chats List -->
-      <div class="tg-chat-list" id="chatsList">
+      <!-- Search Bar -->
+      <div class="search-bar-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="chatSearchInput" placeholder="Search chats, contacts, channels..." oninput="handleSearchChats()">
+          <button class="search-clear hidden" id="btnClearSearch" onclick="clearSearch()">✕</button>
+        </div>
+      </div>
+
+      <!-- Chat & Rooms List (WhatsApp/Telegram Hybrid List) -->
+      <div class="chats-list-container" id="chatsListContainer">
         <!-- Rendered dynamically -->
       </div>
 
-      <!-- Floating Action Button (New Group / Chat) -->
-      <button class="tg-fab" id="btnNewChat" title="New Group" onclick="openNewGroupModal()">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-        </svg>
+      <!-- Floating Action Button (+ New Group / Channel) -->
+      <button class="fab-new-chat" id="btnNewChat" title="New Room / Channel" onclick="openNewRoomModal()">
+        <span class="fab-icon">✏️</span>
       </button>
 
-      <!-- Connection Status Strip (Bottom) -->
-      <div class="tg-status-strip">
-        <span class="status-indicator online" id="statusDot"></span>
-        <span class="status-label" id="statusText">Connected to Telegram Cloud</span>
+      <!-- Sidebar Footer Status Strip -->
+      <div class="sidebar-status-strip">
+        <div class="status-indicator-dot online" id="statusDot"></div>
+        <span class="status-info-text" id="statusText">OmniChat Live • Port 8080</span>
+        <span class="active-pill" id="activeUsersPill">Active: 1</span>
       </div>
     </aside>
 
-    <!-- RIGHT/CENTER COLUMN: Active Conversation -->
-    <main class="tg-chat-area" id="chatArea">
-      
+    <!-- CENTER / RIGHT: Chat Window -->
+    <main class="omni-chat-window" id="chatWindow">
+
       <!-- Chat Header -->
-      <header class="tg-chat-header">
-        <button class="tg-back-btn" id="btnBackToChats" onclick="toggleMobileView(false)">
+      <header class="chat-top-header">
+        <button class="mobile-back-btn" onclick="toggleMobileView(false)">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
         </button>
 
-        <div class="tg-header-avatar" id="headerAvatar" onclick="openProfileDrawer()">
-          <span id="headerAvatarInitials">WD</span>
+        <div class="chat-header-avatar-wrap" onclick="openRoomDetailsModal()">
+          <div class="chat-header-avatar" id="headerAvatar">WD</div>
+          <span class="header-online-dot"></span>
         </div>
 
-        <div class="tg-header-info" onclick="openProfileDrawer()">
-          <div class="tg-header-title-row">
-            <h3 id="headerChatTitle">Web Dev III • General</h3>
-            <span class="tg-verified-icon hidden" id="headerVerifiedIcon" title="Verified">✓</span>
+        <div class="chat-header-meta" onclick="openRoomDetailsModal()">
+          <div class="chat-header-title-row">
+            <h3 id="headerChatTitle">Web Dev III • Official</h3>
+            <span class="verified-icon" title="Official Classroom Group">✓</span>
           </div>
-          <div class="tg-header-subtitle" id="headerChatSubtitle">4 members, 1 online</div>
+          <span class="chat-header-subtitle" id="headerChatSubtitle">Active now • 4 members</span>
         </div>
 
-        <div class="tg-header-actions">
-          <button class="tg-icon-btn" title="Search in this chat" onclick="focusSearch()">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+        <div class="chat-header-actions">
+          <button class="header-action-btn" title="Send Classroom 'kuchbhi' Event" onclick="sendClassroomEvent()">
+            <span class="action-icon">🚀</span>
+            <span class="action-label">Class Event</span>
           </button>
-          
-          <button class="tg-icon-btn" title="Group Info" onclick="openProfileDrawer()">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
+          <button class="header-action-btn" title="Group Info & Members" onclick="openRoomDetailsModal()">
+            <span class="action-icon">ℹ️</span>
           </button>
-
-          <button class="tg-icon-btn" id="btnHeaderMore" title="More options" onclick="toggleHeaderMenu()">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-            </svg>
+          <button class="header-action-btn" id="btnHeaderMenu" title="Menu" onclick="toggleHeaderMenu()">
+            <span class="action-icon">⋮</span>
           </button>
 
-          <!-- Header Dropdown Menu -->
-          <div class="tg-dropdown-menu hidden" id="headerDropdown">
-            <div class="tg-dropdown-item" onclick="openProfileDrawer()">
-              <span>Group Info</span>
+          <!-- Dropdown Options Menu -->
+          <div class="header-dropdown hidden" id="headerDropdown">
+            <div class="dropdown-item" onclick="openRoomDetailsModal()">
+              <span>👥 Group Info & Members</span>
             </div>
-            <div class="tg-dropdown-item" onclick="sendTestKuchbhi()">
-              <span>Send Classroom Event ('kuchbhi')</span>
+            <div class="dropdown-item" onclick="sendClassroomEvent()">
+              <span>📡 Emit 'kuchbhi' Event</span>
             </div>
-            <div class="tg-dropdown-item" onclick="toggleMuteChat()">
-              <span id="muteMenuItemText">Mute Notifications</span>
+            <div class="dropdown-item" onclick="toggleMuteChat()">
+              <span id="dropdownMuteText">🔕 Mute Notifications</span>
             </div>
-            <div class="tg-dropdown-item danger" onclick="leaveCurrentRoom()">
-              <span>Leave Group</span>
+            <div class="dropdown-item danger" onclick="leaveCurrentRoom()">
+              <span>🚪 Leave Room</span>
             </div>
           </div>
         </div>
       </header>
 
-      <!-- Telegram Pinned Message Bar (Displays Server Announcement) -->
-      <div class="tg-pinned-bar" id="pinnedBar" onclick="scrollToAnnouncement()">
-        <div class="tg-pinned-line"></div>
-        <div class="tg-pinned-content">
-          <span class="tg-pinned-title">📌 Pinned Message</span>
-          <span class="tg-pinned-text" id="pinnedMessageText">"Today is last time we study web dev -3"</span>
+      <!-- TELEGRAM PINNED BANNER (Server Announcement) -->
+      <div class="pinned-announcement-bar" id="pinnedBanner">
+        <div class="pinned-indicator-bar"></div>
+        <div class="pinned-content">
+          <span class="pinned-tag">📌 PINNED ANNOUNCEMENT</span>
+          <span class="pinned-msg" id="pinnedAnnouncementText">"Today is last time we study web dev -3"</span>
         </div>
-        <button class="tg-pinned-close" title="Dismiss" onclick="dismissPinned(event)">✕</button>
+        <button class="pinned-close" title="Dismiss" onclick="dismissPinnedBanner(event)">✕</button>
+      </div>
+
+      <!-- WHATSAPP SYSTEM INFO BANNER (Server Gyan Ki Baat) -->
+      <div class="system-info-card" id="gyanKiBaatCard">
+        <span class="info-icon">💡</span>
+        <div class="info-text">
+          <strong>Gyan Ki Baat:</strong> <span id="gyanKiBaatText">welcome to socket.io server</span>
+        </div>
+        <button class="info-dismiss" onclick="dismissGyanCard()">✕</button>
       </div>
 
       <!-- Messages Viewport -->
-      <div class="tg-messages-viewport" id="messagesViewport">
-        <div class="tg-messages-container" id="messagesContainer">
-          <!-- Rendered messages will appear here -->
+      <div class="messages-viewport" id="messagesViewport">
+        <div class="messages-stream" id="messagesStream">
+          <!-- Dynamically populated chat messages -->
         </div>
       </div>
 
-      <!-- Typing Indicator -->
-      <div class="tg-typing-bar hidden" id="typingBar">
-        <div class="tg-typing-wave">
-          <span></span><span></span><span></span>
+      <!-- Real-Time Typing Indicator -->
+      <div class="typing-pill-bar hidden" id="typingPillBar">
+        <div class="typing-avatar" id="typingAvatar">AL</div>
+        <div class="typing-bubble">
+          <span id="typingUsername">Someone</span> is typing
+          <span class="dots-pulse"><span></span><span></span><span></span></span>
         </div>
-        <span class="tg-typing-text" id="typingText">Someone is typing...</span>
       </div>
 
-      <!-- Bottom Chat Input Bar -->
-      <div class="tg-input-bar">
-        <!-- Attachment Button -->
-        <button class="tg-icon-btn tg-attach-btn" id="btnAttach" title="Attach file" onclick="toggleAttachMenu()">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-            <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
-          </svg>
-        </button>
-
-        <!-- Attachment Popover -->
-        <div class="tg-attach-menu hidden" id="attachMenu">
-          <div class="tg-attach-option" onclick="sendAttachment('photo')">
-            <span class="attach-icon photo">📷</span>
-            <span>Photo or Video</span>
+      <!-- BOTTOM COMPOSER: WhatsApp Paperclip + Instagram Gradient Send + Emoji -->
+      <div class="composer-container">
+        <!-- Attachment Popover (WhatsApp Style) -->
+        <div class="attachment-popover hidden" id="attachPopover">
+          <div class="attach-item" onclick="handleAttachment('photo')">
+            <span class="attach-badge red">📸</span>
+            <span>Photos & Videos</span>
           </div>
-          <div class="tg-attach-option" onclick="sendAttachment('file')">
-            <span class="attach-icon doc">📄</span>
+          <div class="attach-item" onclick="handleAttachment('voice')">
+            <span class="attach-badge purple">🎙️</span>
+            <span>Voice Memo</span>
+          </div>
+          <div class="attach-item" onclick="handleAttachment('doc')">
+            <span class="attach-badge blue">📄</span>
             <span>Document</span>
           </div>
-          <div class="tg-attach-option" onclick="sendAttachment('poll')">
-            <span class="attach-icon poll">📊</span>
-            <span>Poll</span>
+          <div class="attach-item" onclick="handleAttachment('poll')">
+            <span class="attach-badge green">📊</span>
+            <span>Poll / Quiz</span>
           </div>
         </div>
 
-        <!-- Message Input -->
-        <div class="tg-input-wrapper">
-          <textarea 
-            id="messageInput" 
-            class="tg-textarea" 
-            placeholder="Write a message..." 
-            rows="1"
-            onkeydown="handleKeydown(event)"
-            oninput="handleInput()"></textarea>
-        </div>
-
-        <!-- Emoji / Sticker Button -->
-        <div class="tg-emoji-wrapper">
-          <button class="tg-icon-btn" id="btnEmoji" title="Emoji" onclick="toggleEmojiPicker()">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-              <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-            </svg>
+        <div class="composer-inner">
+          <button class="composer-btn attach-btn" id="btnAttach" title="Attach file" onclick="toggleAttachMenu()">
+            📎
           </button>
 
-          <!-- Emoji Picker Popover -->
-          <div class="tg-emoji-popover hidden" id="emojiPopover">
-            <div class="emoji-tabs">
-              <button class="emoji-tab active">😀 Smileys</button>
-            </div>
-            <div class="emoji-grid">
-              <span onclick="insertEmoji('👍')">👍</span>
+          <div class="composer-input-wrapper">
+            <textarea 
+              id="messageInput" 
+              class="composer-textarea" 
+              placeholder="Message #general... (Double-tap any message to ❤️)" 
+              rows="1"
+              onkeydown="handleComposerKeydown(event)"
+              oninput="handleComposerInput()"></textarea>
+          </div>
+
+          <!-- Emoji Picker Toggle -->
+          <div class="emoji-wrapper">
+            <button class="composer-btn emoji-btn" id="btnEmoji" title="Emoji & Stickers" onclick="toggleEmojiPicker()">
+              😊
+            </button>
+            
+            <!-- Quick Emoji Tray -->
+            <div class="quick-emoji-tray hidden" id="emojiTray">
               <span onclick="insertEmoji('❤️')">❤️</span>
               <span onclick="insertEmoji('🔥')">🔥</span>
               <span onclick="insertEmoji('😂')">😂</span>
-              <span onclick="insertEmoji('👏')">👏</span>
+              <span onclick="insertEmoji('👍')">👍</span>
+              <span onclick="insertEmoji('🙌')">🙌</span>
               <span onclick="insertEmoji('🎉')">🎉</span>
               <span onclick="insertEmoji('🚀')">🚀</span>
-              <span onclick="insertEmoji('😍')">😍</span>
-              <span onclick="insertEmoji('🤔')">🤔</span>
-              <span onclick="insertEmoji('🙏')">🙏</span>
               <span onclick="insertEmoji('✨')">✨</span>
               <span onclick="insertEmoji('💯')">💯</span>
               <span onclick="insertEmoji('😎')">😎</span>
-              <span onclick="insertEmoji('🥳')">🥳</span>
-              <span onclick="insertEmoji('🤝')">🤝</span>
             </div>
           </div>
+
+          <!-- Send Action Button (Voice Mic when empty, Instagram Gradient Plane when text entered) -->
+          <button class="send-action-btn" id="btnSendAction" onclick="handleSendActionClick()">
+            <span class="icon-send">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </span>
+            <span class="icon-mic hidden">🎙️</span>
+          </button>
         </div>
-
-        <!-- Action Button: Mic when empty, Telegram Plane when text entered -->
-        <button class="tg-send-btn" id="btnAction" onclick="handleSendButtonClick()">
-          <!-- Plane Icon (Send) -->
-          <svg class="icon-send" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-          <!-- Mic Icon (Voice Note) -->
-          <svg class="icon-mic hidden" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-            <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-          </svg>
-        </button>
-
       </div>
     </main>
 
-    <!-- SLIDE-OVER DRAWER (TELEGRAM HAMBURGER MENU) -->
-    <div class="tg-drawer-overlay hidden" id="drawerOverlay" onclick="toggleDrawer(false)">
-      <div class="tg-drawer" id="mainDrawer" onclick="event.stopPropagation()">
-        <!-- User Profile Header -->
-        <div class="tg-drawer-user-card">
-          <div class="tg-drawer-avatar" id="drawerAvatar">PK</div>
-          <div class="tg-drawer-user-info">
-            <h4 id="drawerUsername">Pawan Kumar</h4>
-            <span class="tg-drawer-phone" id="drawerHandle">@pawank • online</span>
-          </div>
-        </div>
-
-        <!-- Menu Navigation -->
-        <div class="tg-drawer-menu">
-          <div class="tg-menu-item" onclick="openNewGroupModal(); toggleDrawer(false);">
-            <span class="menu-icon">👥</span>
-            <span>New Group</span>
-          </div>
-          <div class="tg-menu-item" onclick="openNewChannelModal(); toggleDrawer(false);">
-            <span class="menu-icon">📢</span>
-            <span>New Channel</span>
-          </div>
-          <div class="tg-menu-item" onclick="openSavedMessages(); toggleDrawer(false);">
-            <span class="menu-icon">🔖</span>
-            <span>Saved Messages</span>
-          </div>
-          <div class="tg-menu-item" onclick="openClassroomMonitor(); toggleDrawer(false);">
-            <span class="menu-icon">📡</span>
-            <span>Classroom Event Stream</span>
-          </div>
-          <div class="tg-menu-item" onclick="toggleTheme();">
-            <span class="menu-icon" id="themeIcon">🌙</span>
-            <span id="themeText">Night Mode</span>
-          </div>
-          <div class="tg-menu-divider"></div>
-          <div class="tg-menu-item" onclick="openSettingsModal(); toggleDrawer(false);">
-            <span class="menu-icon">⚙️</span>
-            <span>Settings & Profile</span>
-          </div>
-        </div>
-
-        <div class="tg-drawer-footer">
-          <span>Telegram WebK v2.4 • Web Dev III</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT SLIDE-OVER: GROUP INFO PANEL -->
-    <aside class="tg-info-panel hidden" id="infoPanel">
-      <div class="tg-info-header">
-        <button class="tg-icon-btn" onclick="closeProfileDrawer()">✕</button>
-        <h4>Group Info</h4>
-      </div>
-      <div class="tg-info-body">
-        <div class="tg-info-profile-block">
-          <div class="tg-info-avatar" id="infoAvatar">WD</div>
-          <h3 id="infoTitle">Web Dev III • General</h3>
-          <span class="tg-info-members-count" id="infoSubtitle">4 members</span>
-        </div>
-
-        <div class="tg-info-section">
-          <label>Description</label>
-          <p id="infoDescription">Official class discussion group for Web Development III (Node.js & Socket.IO).</p>
-        </div>
-
-        <div class="tg-info-section">
-          <div class="tg-info-row">
-            <span>Notifications</span>
-            <input type="checkbox" id="infoNotifyToggle" checked onchange="toggleMuteChat()">
-          </div>
-        </div>
-
-        <div class="tg-info-section">
-          <label>Members (<span id="infoMembersNum">4</span>)</label>
-          <div class="tg-members-list" id="infoMembersList">
-            <!-- Dynamic list of members -->
-          </div>
-        </div>
-      </div>
-    </aside>
-
   </div>
 
-  <!-- MODAL: User Setup / Join Modal (Telegram Login Style) -->
-  <div class="tg-modal-overlay" id="loginModal">
-    <div class="tg-modal-card">
-      <div class="tg-modal-brand">
-        <div class="tg-login-plane">
-          <svg viewBox="0 0 240 240" width="80" height="80">
-            <circle cx="120" cy="120" r="120" fill="#2AABEE"/>
-            <path d="M54.3 118.8c34.9-15.2 58.2-25.2 69.9-30.1 33.3-13.9 40.2-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.6 2.4 1.7 3.4.2 1 0 2.4-.2 3.8-2.6 27.4-13.9 94-19.6 124.6-2.4 13-7.2 17.3-11.8 17.8-10.1 1-17.7-6.5-27.5-12.9-15.3-10-23.9-16.3-38.8-26.1-17.2-11.3-6.1-17.5 3.8-27.7 2.6-2.7 47.3-43.4 48.2-47.2.1-.5.2-2.3-.9-3.2-1.1-.9-2.7-.6-3.8-.3-1.6.4-27.7 17.6-78.1 51.6-7.4 5.1-14.1 7.6-20.1 7.5-6.6-.2-19.3-3.8-28.7-6.8-11.6-3.8-20.8-5.8-20-12.2.4-3.4 5.1-6.9 14-10.6z" fill="#fff"/>
-          </svg>
-        </div>
-        <h2>Telegram Web</h2>
-        <p>Please enter your name to sign in to the Web Dev III messenger.</p>
+  <!-- INSTAGRAM STORY VIEWER MODAL -->
+  <div class="story-viewer-modal hidden" id="storyViewerModal" onclick="closeStoryViewer()">
+    <div class="story-viewer-card" onclick="event.stopPropagation()">
+      <div class="story-progress-bar">
+        <div class="story-progress-fill" id="storyProgressFill"></div>
       </div>
-
-      <div class="tg-modal-form">
-        <div class="tg-input-group">
-          <label>Your Name</label>
-          <input type="text" id="loginUsername" class="tg-text-input" placeholder="e.g. Pawan Kumar" maxlength="24" autofocus>
+      <div class="story-card-header">
+        <div class="story-author-avatar" id="storyAuthorAvatar">PK</div>
+        <div class="story-author-meta">
+          <strong id="storyAuthorName">Pawan Kumar</strong>
+          <small id="storyTimeAgo">2h ago</small>
         </div>
-
-        <div class="tg-input-group">
-          <label>Username / Handle</label>
-          <div class="tg-input-prefix">
-            <span>@</span>
-            <input type="text" id="loginHandle" class="tg-text-input" placeholder="pawank" maxlength="20">
-          </div>
-        </div>
-
-        <div class="tg-input-group">
-          <label>Choose Avatar Color</label>
-          <div class="tg-color-palette" id="loginColorPalette">
-            <span class="palette-swatch selected" data-color="#e17076" style="background:#e17076;"></span>
-            <span class="palette-swatch" data-color="#e59a4c" style="background:#e59a4c;"></span>
-            <span class="palette-swatch" data-color="#997eeb" style="background:#997eeb;"></span>
-            <span class="palette-swatch" data-color="#4fad53" style="background:#4fad53;"></span>
-            <span class="palette-swatch" data-color="#3ca3e8" style="background:#3ca3e8;"></span>
-            <span class="palette-swatch" data-color="#d978a3" style="background:#d978a3;"></span>
-          </div>
-        </div>
-
-        <button type="button" class="tg-btn tg-btn-primary" onclick="submitLogin()">NEXT</button>
+        <button class="story-close-btn" onclick="closeStoryViewer()">✕</button>
+      </div>
+      <div class="story-card-content" id="storyCardContent">
+        <div class="story-caption" id="storyCaption">"Preparing our Web Dev III Assignment 4 presentation on Socket.IO! 🚀"</div>
+      </div>
+      <div class="story-card-footer">
+        <input type="text" id="storyReplyInput" placeholder="Reply to story..." onkeydown="handleStoryReplyKeydown(event)">
+        <button class="story-heart-btn" onclick="sendStoryHeart()">❤️</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: New Group / Channel Modal -->
-  <div class="tg-modal-overlay hidden" id="newGroupModal">
-    <div class="tg-modal-card">
-      <div class="tg-modal-header">
-        <h3 id="modalGroupTypeTitle">New Group</h3>
-        <button class="tg-icon-btn" onclick="closeNewGroupModal()">✕</button>
+  <!-- MODAL: Sign In / Profile Setup (Instagram / WhatsApp Style) -->
+  <div class="omni-modal-overlay" id="profileModal">
+    <div class="omni-modal-card">
+      <div class="modal-card-brand">
+        <div class="brand-gradient-avatar" id="modalPreviewAvatar">PK</div>
+        <h2>Welcome to OmniChat</h2>
+        <p>Enter your profile details to join the live social chat.</p>
       </div>
 
-      <div class="tg-modal-form">
-        <div class="tg-input-group">
-          <label>Group / Channel Name</label>
-          <input type="text" id="modalGroupName" class="tg-text-input" placeholder="e.g. Study Group, Project Discussion">
+      <div class="modal-card-form">
+        <div class="input-field-group">
+          <label>Display Name</label>
+          <input type="text" id="inputUsername" class="omni-input" placeholder="e.g. Pawan Kumar" maxlength="24" autofocus>
         </div>
 
-        <div class="tg-input-group">
-          <label>Description (optional)</label>
-          <input type="text" id="modalGroupDesc" class="tg-text-input" placeholder="What is this group about?">
+        <div class="input-field-group">
+          <label>Handle / Nickname</label>
+          <div class="prefix-input">
+            <span class="prefix">@</span>
+            <input type="text" id="inputHandle" class="omni-input" placeholder="pawank" maxlength="20">
+          </div>
         </div>
 
-        <div class="tg-checkbox-group">
+        <div class="input-field-group">
+          <label>Status / Bio (Instagram Bio)</label>
+          <input type="text" id="inputBio" class="omni-input" placeholder="e.g. Coding Web Dev III • Socket.IO 🚀" value="Web Dev III student • Ready for presentation!">
+        </div>
+
+        <div class="input-field-group">
+          <label>Avatar Theme Accent</label>
+          <div class="color-swatches" id="modalColorSwatches">
+            <span class="color-swatch selected" data-color="#833ab4" style="background: linear-gradient(135deg, #833ab4, #fd1d1d);"></span>
+            <span class="color-swatch" data-color="#25d366" style="background: linear-gradient(135deg, #25d366, #128c7e);"></span>
+            <span class="color-swatch" data-color="#0088cc" style="background: linear-gradient(135deg, #0088cc, #2481cc);"></span>
+            <span class="color-swatch" data-color="#ff007f" style="background: linear-gradient(135deg, #ff007f, #7928ca);"></span>
+            <span class="color-swatch" data-color="#ff7b00" style="background: linear-gradient(135deg, #ff7b00, #ffae00);"></span>
+          </div>
+        </div>
+
+        <button type="button" class="btn-gradient-submit" onclick="submitProfile()">JOIN OMNICHAT ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: New Room / Group Creation (Telegram Channels + WhatsApp Groups) -->
+  <div class="omni-modal-overlay hidden" id="newRoomModal">
+    <div class="omni-modal-card">
+      <div class="modal-card-header">
+        <h3>Create Channel / Group</h3>
+        <button class="modal-close" onclick="closeNewRoomModal()">✕</button>
+      </div>
+
+      <div class="modal-card-form">
+        <div class="input-field-group">
+          <label>Channel / Group Name</label>
+          <input type="text" id="newRoomNameInput" class="omni-input" placeholder="e.g. webdev-exam, gaming, project-talk">
+        </div>
+
+        <div class="input-field-group">
+          <label>Description / Topic</label>
+          <input type="text" id="newRoomDescInput" class="omni-input" placeholder="What is this channel about?">
+        </div>
+
+        <div class="checkbox-field">
           <label>
-            <input type="checkbox" id="modalGroupPrivate" onchange="togglePrivateGroupPassword()">
-            Private Group (Require Access Key)
+            <input type="checkbox" id="newRoomPrivateCheckbox" onchange="togglePrivateRoomPass()">
+            Make this channel Private (Password Protected)
           </label>
         </div>
 
-        <div class="tg-input-group hidden" id="modalPasswordGroup">
-          <label>Access Key / Password</label>
-          <input type="password" id="modalGroupPassword" class="tg-text-input" placeholder="Enter key for joining">
+        <div class="input-field-group hidden" id="privateRoomPassGroup">
+          <label>Access Password</label>
+          <input type="password" id="newRoomPasswordInput" class="omni-input" placeholder="Enter password for members">
         </div>
 
-        <div class="tg-modal-actions">
-          <button type="button" class="tg-btn tg-btn-outline" onclick="closeNewGroupModal()">Cancel</button>
-          <button type="button" class="tg-btn tg-btn-primary" onclick="submitCreateGroup()">CREATE</button>
+        <div class="modal-actions-row">
+          <button type="button" class="btn-cancel" onclick="closeNewRoomModal()">Cancel</button>
+          <button type="button" class="btn-gradient-submit" onclick="submitCreateRoom()">CREATE ROOM</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Classroom Live Event Monitor (For Monday's Presentation) -->
-  <div class="tg-modal-overlay hidden" id="classroomMonitorModal">
-    <div class="tg-modal-card wide">
-      <div class="tg-modal-header">
-        <h3>Classroom Socket.IO Event Inspector</h3>
-        <button class="tg-icon-btn" onclick="closeClassroomMonitor()">✕</button>
+  <!-- MODAL: Room Details & Members Drawer -->
+  <div class="omni-modal-overlay hidden" id="roomDetailsModal" onclick="closeRoomDetailsModal()">
+    <div class="omni-modal-card" onclick="event.stopPropagation()">
+      <div class="modal-card-header">
+        <h3>Group Info & Members</h3>
+        <button class="modal-close" onclick="closeRoomDetailsModal()">✕</button>
       </div>
-      <div class="tg-modal-body">
-        <p class="tg-text-muted">Live feed of raw Socket.IO events handled by your professor's original backend:</p>
-        <div class="tg-monitor-terminal" id="monitorTerminal">
-          <!-- Live events logged here -->
+      <div class="room-details-body">
+        <div class="room-header-preview">
+          <div class="preview-avatar" id="detailsRoomAvatar">WD</div>
+          <h4 id="detailsRoomName">Web Dev III • Official</h4>
+          <span class="preview-members" id="detailsMemberCount">4 members</span>
         </div>
-        <div class="tg-modal-actions mt-sm">
-          <button class="tg-btn tg-btn-outline" onclick="sendTestKuchbhi()">Send 'kuchbhi' Event</button>
-          <button class="tg-btn tg-btn-primary" onclick="closeClassroomMonitor()">Close</button>
+        <p class="details-desc" id="detailsRoomDesc">Official class discussion room for Web Development III (Node.js & Socket.IO).</p>
+
+        <h5 class="members-title">Active Members</h5>
+        <div class="members-stream" id="detailsMembersStream">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Classroom Event Monitor (For Monday's Presentation) -->
+  <div class="omni-modal-overlay hidden" id="classroomMonitorModal">
+    <div class="omni-modal-card wide">
+      <div class="modal-card-header">
+        <h3>Classroom Socket.IO Event Monitor</h3>
+        <button class="modal-close" onclick="closeClassroomMonitor()">✕</button>
+      </div>
+      <div class="monitor-modal-body">
+        <p class="text-muted">Live event stream from your professor's Socket.IO backend:</p>
+        <div class="monitor-terminal-box" id="monitorTerminal"></div>
+        <div class="modal-actions-row mt-sm">
+          <button class="btn-cancel" onclick="sendClassroomEvent()">Emit 'kuchbhi' Event</button>
+          <button class="btn-gradient-submit" onclick="closeClassroomMonitor()">Close</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Toast Notification Container -->
-  <div class="tg-toast-container" id="toastContainer"></div>
+  <div class="omni-toast-container" id="toastContainer"></div>
 
   <script src="app.js"></script>
 </body>
