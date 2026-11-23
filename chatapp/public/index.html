@@ -3,413 +3,314 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>OmniChat – The Social Messenger (WhatsApp • Instagram • Telegram)</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23833ab4'/%3E%3Cstop offset='50%25' stop-color='%23fd1d1d'/%3E%3Cstop offset='100%25' stop-color='%23fcb045'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='28' fill='url(%23g)'/%3E%3Cpath d='M30 48c0-11 9-20 20-20s20 9 20 20c0 10-7 18-17 19.7v7.3l-7.5-5.2C36 68 30 58.7 30 48z' fill='%23fff'/%3E%3C/svg%3E">
+  <title>Chat – Web Dev III</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body class="theme-dark">
-  <div class="omni-app" id="omniApp">
+  <div class="chat-root" id="chatRoot">
 
-    <!-- LEFT SIDEBAR: Navigation, Stories, Channels & Chats -->
-    <aside class="omni-sidebar" id="sidebar">
-
-      <!-- App Header: Branding + Action Icons -->
+    <!-- LEFT SIDEBAR: Channels & Direct Rooms -->
+    <aside class="chat-sidebar" id="chatSidebar">
+      
+      <!-- Workspace Brand & Profile Header -->
       <div class="sidebar-header">
-        <div class="brand-badge">
-          <div class="brand-gradient-logo">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.18-1.32C8.6 21.52 10.25 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+        <div class="workspace-pill" onclick="openProfileModal()">
+          <div class="user-avatar" id="sidebarUserAvatar">PK</div>
+          <div class="workspace-info">
+            <h2 id="sidebarUserName">Pawan Kumar</h2>
+            <span class="user-handle" id="sidebarUserHandle">@pawank</span>
+          </div>
+          <button class="settings-trigger-btn" title="Edit Profile">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
-          </div>
-          <div class="brand-title-wrap">
-            <h2>OmniChat</h2>
-            <span class="hybrid-tag">WA • IG • TG</span>
-          </div>
-        </div>
-
-        <div class="header-tools">
-          <button class="tool-btn" id="btnThemeToggle" title="Toggle Theme" onclick="toggleAppTheme()">🌙</button>
-          <button class="tool-btn" title="Classroom Event Monitor" onclick="openClassroomMonitor()">📡</button>
-          <button class="tool-btn" title="My Profile" onclick="openProfileModal()">👤</button>
+          </button>
         </div>
       </div>
 
-      <!-- INSTAGRAM-STYLE STORIES / STATUS CAROUSEL -->
-      <div class="stories-wrapper">
-        <div class="stories-scroll" id="storiesScroll">
-          <!-- "Your Story" item -->
-          <div class="story-item" onclick="openMyStory()">
-            <div class="story-ring unread my-story" id="myStoryRing">
-              <div class="story-avatar" id="myStoryAvatar">PK</div>
-              <span class="story-add-badge">+</span>
+      <!-- Search Input -->
+      <div class="sidebar-search">
+        <div class="search-input-box">
+          <svg class="search-icon" viewBox="0 0 20 20" width="15" height="15" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+          <input type="text" id="channelSearchInput" placeholder="Jump to channel... (Ctrl+K)" oninput="filterChannelsList()">
+          <span class="search-shortcut">/</span>
+        </div>
+      </div>
+
+      <!-- Navigation Lists -->
+      <div class="sidebar-nav-scroll" id="sidebarNavScroll">
+        
+        <!-- Channels Section -->
+        <div class="nav-section">
+          <div class="nav-section-header">
+            <span>CHANNELS</span>
+            <button class="add-channel-btn" title="Create Room" onclick="openCreateRoomModal()">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </div>
+          <div class="channels-list" id="channelsListContainer">
+            <!-- Dynamically populated room items -->
+          </div>
+        </div>
+
+        <!-- Saved Notes & Personal Section -->
+        <div class="nav-section mt-sm">
+          <div class="nav-section-header">
+            <span>SAVED & SYSTEM</span>
+          </div>
+          <div class="channels-list">
+            <div class="channel-item" id="itemSavedNotes" onclick="openSavedNotes()">
+              <span class="channel-prefix">📌</span>
+              <span class="channel-name">saved-notes</span>
+              <span class="channel-badge" id="badgeSavedCount">0</span>
             </div>
-            <span class="story-name">Your Story</span>
+            <div class="channel-item" onclick="openClassroomMonitor()">
+              <span class="channel-prefix">⚡</span>
+              <span class="channel-name">event-monitor</span>
+            </div>
           </div>
-          <!-- Live stories populated via JS -->
-          <div id="dynamicStoriesList" class="dynamic-stories-row"></div>
         </div>
+
       </div>
 
-      <!-- WHATSAPP-STYLE TAB NAVIGATION -->
-      <div class="omni-tabs">
-        <button class="omni-tab active" data-tab="all" onclick="filterChats('all')">
-          <span>All Chats</span>
-          <span class="tab-badge" id="badgeAllChats">4</span>
-        </button>
-        <button class="omni-tab" data-tab="groups" onclick="filterChats('groups')">
-          <span>Groups</span>
-        </button>
-        <button class="omni-tab" data-tab="channels" onclick="filterChats('channels')">
-          <span>Channels</span>
-        </button>
-        <button class="omni-tab" data-tab="saved" onclick="filterChats('saved')">
-          <span>Saved</span>
-        </button>
-      </div>
-
-      <!-- Search Bar -->
-      <div class="search-bar-wrap">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="chatSearchInput" placeholder="Search chats, contacts, channels..." oninput="handleSearchChats()">
-          <button class="search-clear hidden" id="btnClearSearch" onclick="clearSearch()">✕</button>
+      <!-- Sidebar Footer: Status & Active Count -->
+      <div class="sidebar-footer">
+        <div class="status-connection">
+          <span class="status-indicator-dot online" id="statusDot"></span>
+          <span class="status-label" id="statusLabel">Connected</span>
         </div>
+        <div class="active-count-badge" id="activeUsersBadge">1 online</div>
       </div>
 
-      <!-- Chat & Rooms List (WhatsApp/Telegram Hybrid List) -->
-      <div class="chats-list-container" id="chatsListContainer">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Floating Action Button (+ New Group / Channel) -->
-      <button class="fab-new-chat" id="btnNewChat" title="New Room / Channel" onclick="openNewRoomModal()">
-        <span class="fab-icon">✏️</span>
-      </button>
-
-      <!-- Sidebar Footer Status Strip -->
-      <div class="sidebar-status-strip">
-        <div class="status-indicator-dot online" id="statusDot"></div>
-        <span class="status-info-text" id="statusText">OmniChat Live • Port 8080</span>
-        <span class="active-pill" id="activeUsersPill">Active: 1</span>
-      </div>
     </aside>
 
-    <!-- CENTER / RIGHT: Chat Window -->
-    <main class="omni-chat-window" id="chatWindow">
-
-      <!-- Chat Header -->
-      <header class="chat-top-header">
-        <button class="mobile-back-btn" onclick="toggleMobileView(false)">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    <!-- RIGHT/MAIN: Chat Conversation Feed -->
+    <main class="chat-main" id="chatMain">
+      
+      <!-- Top Header -->
+      <header class="main-header">
+        <button class="mobile-toggle-btn" onclick="toggleMobileSidebar(true)">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
           </svg>
         </button>
 
-        <div class="chat-header-avatar-wrap" onclick="openRoomDetailsModal()">
-          <div class="chat-header-avatar" id="headerAvatar">WD</div>
-          <span class="header-online-dot"></span>
+        <div class="header-channel-meta">
+          <div class="channel-title-row">
+            <span class="title-hash">#</span>
+            <h3 id="currentChannelTitle">general</h3>
+            <span class="channel-tag" id="currentChannelTag">public</span>
+          </div>
+          <span class="channel-desc" id="currentChannelDesc">Main discussion room for class coursework & announcements</span>
         </div>
 
-        <div class="chat-header-meta" onclick="openRoomDetailsModal()">
-          <div class="chat-header-title-row">
-            <h3 id="headerChatTitle">Web Dev III • Official</h3>
-            <span class="verified-icon" title="Official Classroom Group">✓</span>
+        <div class="header-tools">
+          <div class="members-pill" onclick="openRoomMembersModal()">
+            <span class="members-dot"></span>
+            <span id="headerMembersCount">1 member</span>
           </div>
-          <span class="chat-header-subtitle" id="headerChatSubtitle">Active now • 4 members</span>
-        </div>
 
-        <div class="chat-header-actions">
-          <button class="header-action-btn" title="Send Classroom 'kuchbhi' Event" onclick="sendClassroomEvent()">
-            <span class="action-icon">🚀</span>
-            <span class="action-label">Class Event</span>
-          </button>
-          <button class="header-action-btn" title="Group Info & Members" onclick="openRoomDetailsModal()">
-            <span class="action-icon">ℹ️</span>
-          </button>
-          <button class="header-action-btn" id="btnHeaderMenu" title="Menu" onclick="toggleHeaderMenu()">
-            <span class="action-icon">⋮</span>
+          <button class="tool-btn" title="Emit Classroom 'kuchbhi' Event" onclick="sendClassroomEvent()">
+            <svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+            </svg>
+            <span class="tool-btn-text">Test Event</span>
           </button>
 
-          <!-- Dropdown Options Menu -->
-          <div class="header-dropdown hidden" id="headerDropdown">
-            <div class="dropdown-item" onclick="openRoomDetailsModal()">
-              <span>👥 Group Info & Members</span>
-            </div>
-            <div class="dropdown-item" onclick="sendClassroomEvent()">
-              <span>📡 Emit 'kuchbhi' Event</span>
-            </div>
-            <div class="dropdown-item" onclick="toggleMuteChat()">
-              <span id="dropdownMuteText">🔕 Mute Notifications</span>
-            </div>
-            <div class="dropdown-item danger" onclick="leaveCurrentRoom()">
-              <span>🚪 Leave Room</span>
-            </div>
-          </div>
+          <button class="tool-btn icon-only" title="Toggle Theme" onclick="toggleTheme()">
+            <span id="themeIcon">☀️</span>
+          </button>
         </div>
       </header>
 
-      <!-- TELEGRAM PINNED BANNER (Server Announcement) -->
-      <div class="pinned-announcement-bar" id="pinnedBanner">
-        <div class="pinned-indicator-bar"></div>
-        <div class="pinned-content">
-          <span class="pinned-tag">📌 PINNED ANNOUNCEMENT</span>
-          <span class="pinned-msg" id="pinnedAnnouncementText">"Today is last time we study web dev -3"</span>
-        </div>
-        <button class="pinned-close" title="Dismiss" onclick="dismissPinnedBanner(event)">✕</button>
+      <!-- Pinned Classroom Announcement Banner (Preserved Server Event) -->
+      <div class="announcement-banner" id="announcementBanner">
+        <div class="announcement-badge">ANNOUNCEMENT</div>
+        <div class="announcement-text" id="announcementText">"Today is last time we study web dev -3"</div>
+        <button class="banner-close-btn" title="Dismiss notice" onclick="dismissAnnouncement()">✕</button>
       </div>
 
-      <!-- WHATSAPP SYSTEM INFO BANNER (Server Gyan Ki Baat) -->
-      <div class="system-info-card" id="gyanKiBaatCard">
-        <span class="info-icon">💡</span>
-        <div class="info-text">
-          <strong>Gyan Ki Baat:</strong> <span id="gyanKiBaatText">welcome to socket.io server</span>
-        </div>
-        <button class="info-dismiss" onclick="dismissGyanCard()">✕</button>
+      <!-- Gyan Ki Baat Server Notice (Preserved Server Event) -->
+      <div class="server-notice-bar" id="gyanNoticeBar">
+        <span class="notice-prefix">System Notice:</span>
+        <span class="notice-content" id="gyanNoticeContent">welcome to socket.io server</span>
+        <button class="notice-close" onclick="dismissGyanNotice()">✕</button>
       </div>
 
-      <!-- Messages Viewport -->
+      <!-- Messages Stream -->
       <div class="messages-viewport" id="messagesViewport">
         <div class="messages-stream" id="messagesStream">
-          <!-- Dynamically populated chat messages -->
+          <!-- Rendered messages appear here -->
         </div>
       </div>
 
-      <!-- Real-Time Typing Indicator -->
-      <div class="typing-pill-bar hidden" id="typingPillBar">
-        <div class="typing-avatar" id="typingAvatar">AL</div>
-        <div class="typing-bubble">
-          <span id="typingUsername">Someone</span> is typing
-          <span class="dots-pulse"><span></span><span></span><span></span></span>
-        </div>
+      <!-- Typing Indicator -->
+      <div class="typing-indicator-row hidden" id="typingIndicatorRow">
+        <div class="typing-dot-pulse"><span></span><span></span><span></span></div>
+        <span class="typing-name" id="typingName">Someone is typing...</span>
       </div>
 
-      <!-- BOTTOM COMPOSER: WhatsApp Paperclip + Instagram Gradient Send + Emoji -->
-      <div class="composer-container">
-        <!-- Attachment Popover (WhatsApp Style) -->
-        <div class="attachment-popover hidden" id="attachPopover">
-          <div class="attach-item" onclick="handleAttachment('photo')">
-            <span class="attach-badge red">📸</span>
-            <span>Photos & Videos</span>
-          </div>
-          <div class="attach-item" onclick="handleAttachment('voice')">
-            <span class="attach-badge purple">🎙️</span>
-            <span>Voice Memo</span>
-          </div>
-          <div class="attach-item" onclick="handleAttachment('doc')">
-            <span class="attach-badge blue">📄</span>
-            <span>Document</span>
-          </div>
-          <div class="attach-item" onclick="handleAttachment('poll')">
-            <span class="attach-badge green">📊</span>
-            <span>Poll / Quiz</span>
-          </div>
-        </div>
+      <!-- Elevated Message Composer -->
+      <div class="composer-wrapper">
+        <div class="composer-card">
+          <textarea 
+            id="messageInput" 
+            class="composer-input" 
+            placeholder="Message #general... (Enter to send, Shift+Enter for newline)" 
+            rows="1"
+            onkeydown="handleComposerKeydown(event)"
+            oninput="handleComposerInput()"></textarea>
 
-        <div class="composer-inner">
-          <button class="composer-btn attach-btn" id="btnAttach" title="Attach file" onclick="toggleAttachMenu()">
-            📎
-          </button>
+          <div class="composer-actions-bar">
+            <div class="composer-left-tools">
+              <!-- Quick Reaction Inserters -->
+              <button class="inline-emoji-btn" type="button" onclick="insertEmoji('👍')">👍</button>
+              <button class="inline-emoji-btn" type="button" onclick="insertEmoji('❤️')">❤️</button>
+              <button class="inline-emoji-btn" type="button" onclick="insertEmoji('🔥')">🔥</button>
+              <button class="inline-emoji-btn" type="button" onclick="insertEmoji('🚀')">🚀</button>
+              <button class="inline-emoji-btn" type="button" onclick="insertEmoji('😂')">😂</button>
+            </div>
 
-          <div class="composer-input-wrapper">
-            <textarea 
-              id="messageInput" 
-              class="composer-textarea" 
-              placeholder="Message #general... (Double-tap any message to ❤️)" 
-              rows="1"
-              onkeydown="handleComposerKeydown(event)"
-              oninput="handleComposerInput()"></textarea>
-          </div>
-
-          <!-- Emoji Picker Toggle -->
-          <div class="emoji-wrapper">
-            <button class="composer-btn emoji-btn" id="btnEmoji" title="Emoji & Stickers" onclick="toggleEmojiPicker()">
-              😊
-            </button>
-            
-            <!-- Quick Emoji Tray -->
-            <div class="quick-emoji-tray hidden" id="emojiTray">
-              <span onclick="insertEmoji('❤️')">❤️</span>
-              <span onclick="insertEmoji('🔥')">🔥</span>
-              <span onclick="insertEmoji('😂')">😂</span>
-              <span onclick="insertEmoji('👍')">👍</span>
-              <span onclick="insertEmoji('🙌')">🙌</span>
-              <span onclick="insertEmoji('🎉')">🎉</span>
-              <span onclick="insertEmoji('🚀')">🚀</span>
-              <span onclick="insertEmoji('✨')">✨</span>
-              <span onclick="insertEmoji('💯')">💯</span>
-              <span onclick="insertEmoji('😎')">😎</span>
+            <div class="composer-right-tools">
+              <button class="composer-send-btn" id="btnSend" title="Send message (Enter)" onclick="sendCurrentMessage()">
+                <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                </svg>
+              </button>
             </div>
           </div>
-
-          <!-- Send Action Button (Voice Mic when empty, Instagram Gradient Plane when text entered) -->
-          <button class="send-action-btn" id="btnSendAction" onclick="handleSendActionClick()">
-            <span class="icon-send">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-              </svg>
-            </span>
-            <span class="icon-mic hidden">🎙️</span>
-          </button>
         </div>
       </div>
+
     </main>
 
   </div>
 
-  <!-- INSTAGRAM STORY VIEWER MODAL -->
-  <div class="story-viewer-modal hidden" id="storyViewerModal" onclick="closeStoryViewer()">
-    <div class="story-viewer-card" onclick="event.stopPropagation()">
-      <div class="story-progress-bar">
-        <div class="story-progress-fill" id="storyProgressFill"></div>
-      </div>
-      <div class="story-card-header">
-        <div class="story-author-avatar" id="storyAuthorAvatar">PK</div>
-        <div class="story-author-meta">
-          <strong id="storyAuthorName">Pawan Kumar</strong>
-          <small id="storyTimeAgo">2h ago</small>
-        </div>
-        <button class="story-close-btn" onclick="closeStoryViewer()">✕</button>
-      </div>
-      <div class="story-card-content" id="storyCardContent">
-        <div class="story-caption" id="storyCaption">"Preparing our Web Dev III Assignment 4 presentation on Socket.IO! 🚀"</div>
-      </div>
-      <div class="story-card-footer">
-        <input type="text" id="storyReplyInput" placeholder="Reply to story..." onkeydown="handleStoryReplyKeydown(event)">
-        <button class="story-heart-btn" onclick="sendStoryHeart()">❤️</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Sign In / Profile Setup (Instagram / WhatsApp Style) -->
-  <div class="omni-modal-overlay" id="profileModal">
-    <div class="omni-modal-card">
-      <div class="modal-card-brand">
-        <div class="brand-gradient-avatar" id="modalPreviewAvatar">PK</div>
-        <h2>Welcome to OmniChat</h2>
-        <p>Enter your profile details to join the live social chat.</p>
+  <!-- MODAL: User Setup / Profile Edit -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>User Profile</h3>
+        <p>Set your display name to start chatting with your class.</p>
       </div>
 
-      <div class="modal-card-form">
-        <div class="input-field-group">
+      <div class="modal-form">
+        <div class="form-group">
           <label>Display Name</label>
-          <input type="text" id="inputUsername" class="omni-input" placeholder="e.g. Pawan Kumar" maxlength="24" autofocus>
+          <input type="text" id="inputUsername" class="text-input" placeholder="e.g. Pawan Kumar" maxlength="24" autofocus>
         </div>
 
-        <div class="input-field-group">
-          <label>Handle / Nickname</label>
-          <div class="prefix-input">
-            <span class="prefix">@</span>
-            <input type="text" id="inputHandle" class="omni-input" placeholder="pawank" maxlength="20">
+        <div class="form-group">
+          <label>Username Handle</label>
+          <div class="input-with-affix">
+            <span class="affix">@</span>
+            <input type="text" id="inputHandle" class="text-input" placeholder="pawank" maxlength="20">
           </div>
         </div>
 
-        <div class="input-field-group">
-          <label>Status / Bio (Instagram Bio)</label>
-          <input type="text" id="inputBio" class="omni-input" placeholder="e.g. Coding Web Dev III • Socket.IO 🚀" value="Web Dev III student • Ready for presentation!">
-        </div>
-
-        <div class="input-field-group">
-          <label>Avatar Theme Accent</label>
-          <div class="color-swatches" id="modalColorSwatches">
-            <span class="color-swatch selected" data-color="#833ab4" style="background: linear-gradient(135deg, #833ab4, #fd1d1d);"></span>
-            <span class="color-swatch" data-color="#25d366" style="background: linear-gradient(135deg, #25d366, #128c7e);"></span>
-            <span class="color-swatch" data-color="#0088cc" style="background: linear-gradient(135deg, #0088cc, #2481cc);"></span>
-            <span class="color-swatch" data-color="#ff007f" style="background: linear-gradient(135deg, #ff007f, #7928ca);"></span>
-            <span class="color-swatch" data-color="#ff7b00" style="background: linear-gradient(135deg, #ff7b00, #ffae00);"></span>
+        <div class="form-group">
+          <label>Avatar Color</label>
+          <div class="swatches-row" id="colorSwatches">
+            <span class="swatch selected" data-color="#3b82f6" style="background:#3b82f6;"></span>
+            <span class="swatch" data-color="#10b981" style="background:#10b981;"></span>
+            <span class="swatch" data-color="#8b5cf6" style="background:#8b5cf6;"></span>
+            <span class="swatch" data-color="#f59e0b" style="background:#f59e0b;"></span>
+            <span class="swatch" data-color="#ec4899" style="background:#ec4899;"></span>
+            <span class="swatch" data-color="#06b6d4" style="background:#06b6d4;"></span>
           </div>
         </div>
 
-        <button type="button" class="btn-gradient-submit" onclick="submitProfile()">JOIN OMNICHAT ➔</button>
+        <div class="modal-footer">
+          <button type="button" class="btn-primary" onclick="submitUserProfile()">Continue</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: New Room / Group Creation (Telegram Channels + WhatsApp Groups) -->
-  <div class="omni-modal-overlay hidden" id="newRoomModal">
-    <div class="omni-modal-card">
-      <div class="modal-card-header">
-        <h3>Create Channel / Group</h3>
-        <button class="modal-close" onclick="closeNewRoomModal()">✕</button>
+  <!-- MODAL: Create New Room -->
+  <div class="modal-backdrop hidden" id="createRoomModal">
+    <div class="modal-card">
+      <div class="modal-header-row">
+        <h3>Create Channel</h3>
+        <button class="modal-close-btn" onclick="closeCreateRoomModal()">✕</button>
       </div>
 
-      <div class="modal-card-form">
-        <div class="input-field-group">
-          <label>Channel / Group Name</label>
-          <input type="text" id="newRoomNameInput" class="omni-input" placeholder="e.g. webdev-exam, gaming, project-talk">
+      <div class="modal-form">
+        <div class="form-group">
+          <label>Channel Name</label>
+          <div class="input-with-affix">
+            <span class="affix">#</span>
+            <input type="text" id="inputRoomName" class="text-input" placeholder="project-discussion" maxlength="24">
+          </div>
         </div>
 
-        <div class="input-field-group">
-          <label>Description / Topic</label>
-          <input type="text" id="newRoomDescInput" class="omni-input" placeholder="What is this channel about?">
+        <div class="form-group">
+          <label>Topic / Description (optional)</label>
+          <input type="text" id="inputRoomDesc" class="text-input" placeholder="What is this channel about?">
         </div>
 
-        <div class="checkbox-field">
+        <div class="form-group-checkbox">
           <label>
-            <input type="checkbox" id="newRoomPrivateCheckbox" onchange="togglePrivateRoomPass()">
-            Make this channel Private (Password Protected)
+            <input type="checkbox" id="checkboxPrivateRoom" onchange="togglePrivateRoomField()">
+            Private Channel (requires password)
           </label>
         </div>
 
-        <div class="input-field-group hidden" id="privateRoomPassGroup">
+        <div class="form-group hidden" id="groupPasswordField">
           <label>Access Password</label>
-          <input type="password" id="newRoomPasswordInput" class="omni-input" placeholder="Enter password for members">
+          <input type="password" id="inputRoomPassword" class="text-input" placeholder="Enter channel password">
         </div>
 
-        <div class="modal-actions-row">
-          <button type="button" class="btn-cancel" onclick="closeNewRoomModal()">Cancel</button>
-          <button type="button" class="btn-gradient-submit" onclick="submitCreateRoom()">CREATE ROOM</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Room Details & Members Drawer -->
-  <div class="omni-modal-overlay hidden" id="roomDetailsModal" onclick="closeRoomDetailsModal()">
-    <div class="omni-modal-card" onclick="event.stopPropagation()">
-      <div class="modal-card-header">
-        <h3>Group Info & Members</h3>
-        <button class="modal-close" onclick="closeRoomDetailsModal()">✕</button>
-      </div>
-      <div class="room-details-body">
-        <div class="room-header-preview">
-          <div class="preview-avatar" id="detailsRoomAvatar">WD</div>
-          <h4 id="detailsRoomName">Web Dev III • Official</h4>
-          <span class="preview-members" id="detailsMemberCount">4 members</span>
-        </div>
-        <p class="details-desc" id="detailsRoomDesc">Official class discussion room for Web Development III (Node.js & Socket.IO).</p>
-
-        <h5 class="members-title">Active Members</h5>
-        <div class="members-stream" id="detailsMembersStream">
-          <!-- Populated dynamically -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-secondary" onclick="closeCreateRoomModal()">Cancel</button>
+          <button type="button" class="btn-primary" onclick="submitCreateRoom()">Create Channel</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Classroom Event Monitor (For Monday's Presentation) -->
-  <div class="omni-modal-overlay hidden" id="classroomMonitorModal">
-    <div class="omni-modal-card wide">
-      <div class="modal-card-header">
-        <h3>Classroom Socket.IO Event Monitor</h3>
-        <button class="modal-close" onclick="closeClassroomMonitor()">✕</button>
+  <!-- MODAL: Room Members List -->
+  <div class="modal-backdrop hidden" id="roomMembersModal" onclick="closeRoomMembersModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <h3 id="membersModalTitle">Channel Members</h3>
+        <button class="modal-close-btn" onclick="closeRoomMembersModal()">✕</button>
       </div>
-      <div class="monitor-modal-body">
-        <p class="text-muted">Live event stream from your professor's Socket.IO backend:</p>
-        <div class="monitor-terminal-box" id="monitorTerminal"></div>
-        <div class="modal-actions-row mt-sm">
-          <button class="btn-cancel" onclick="sendClassroomEvent()">Emit 'kuchbhi' Event</button>
-          <button class="btn-gradient-submit" onclick="closeClassroomMonitor()">Close</button>
+      <div class="members-list-box" id="modalMembersList">
+        <!-- Members populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Classroom Socket.IO Monitor -->
+  <div class="modal-backdrop hidden" id="classroomMonitorModal">
+    <div class="modal-card wide">
+      <div class="modal-header-row">
+        <h3>Classroom Socket.IO Event Inspector</h3>
+        <button class="modal-close-btn" onclick="closeClassroomMonitor()">✕</button>
+      </div>
+      <div class="monitor-body">
+        <p class="monitor-hint">Real-time log of raw backend events received from the server:</p>
+        <div class="terminal-box" id="monitorTerminal"></div>
+        <div class="modal-footer-row mt-sm">
+          <button class="btn-secondary" onclick="sendClassroomEvent()">Emit 'kuchbhi' Event</button>
+          <button class="btn-primary" onclick="closeClassroomMonitor()">Close</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
-  <div class="omni-toast-container" id="toastContainer"></div>
+  <!-- Toast Container -->
+  <div class="toast-wrapper" id="toastContainer"></div>
 
   <script src="app.js"></script>
 </body>
