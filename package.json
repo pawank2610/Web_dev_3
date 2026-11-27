@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ShortLink Bitly Clone - Web Dev III Capstone Project",
   "scripts": {
-    "build": "cd Capstone_Project/client && npm install && npm run build && cd ../server && npm install",
+    "build": "cd Capstone_Project/client && npm install && npm run build && cd ../server && npm install && cd ../.. && node -e \"require('fs').cpSync('Capstone_Project/client/dist', 'dist', {recursive: true})\"",
     "start": "cd Capstone_Project/server && node server.js",
     "server": "cd Capstone_Project/server && npm run dev",
     "client": "cd Capstone_Project/client && npm run dev"

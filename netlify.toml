@@ -1,7 +1,7 @@
+# Root Netlify Configuration
 [build]
-  base = "Capstone_Project/client"
-  publish = "dist"
-  command = "npm run build"
+  command = "cd Capstone_Project/client && npm install && npm run build"
+  publish = "Capstone_Project/client/dist"
 
 [[redirects]]
   from = "/*"
