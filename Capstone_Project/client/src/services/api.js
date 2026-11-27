@@ -1,5 +1,4 @@
-
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.port === '5173' ? 'http://localhost:5000/api' : '/api');
 
 export const getStoredTokens = () => {
   return {
@@ -125,6 +124,39 @@ export const api = {
     }).then(async (r) => {
       const d = await r.json();
       if (!r.ok) throw new Error(d.message || 'Login failed');
+      return d;
+    }),
+
+  demoLogin: (role = 'user') =>
+    fetch(`${API_BASE}/auth/demo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role }),
+    }).then(async (r) => {
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.message || 'Demo login failed');
+      return d;
+    }),
+
+  googleLogin: (payload = {}) =>
+    fetch(`${API_BASE}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(async (r) => {
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.message || 'Google sign-in failed');
+      return d;
+    }),
+
+  publicShorten: (payload) =>
+    fetch(`${API_BASE}/links/public-shorten`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(async (r) => {
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.message || 'Public shorten failed');
       return d;
     }),
 

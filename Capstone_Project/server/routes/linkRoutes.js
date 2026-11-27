@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
+  publicShorten,
   createLink,
   getUserLinks,
   getLinkById,
@@ -8,6 +9,8 @@ const {
   getLinkAnalytics,
 } = require('../controllers/linkController');
 const { protect } = require('../middleware/authMiddleware');
+
+router.post('/public-shorten', publicShorten);
 
 router.use(protect);
 

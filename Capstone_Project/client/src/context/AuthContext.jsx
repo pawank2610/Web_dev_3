@@ -4,69 +4,108 @@ import { api, getStoredTokens, setStoredTokens, clearStoredTokens } from '../ser
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('shortlink_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
+    const initializeAuth = async () => {
       const { accessToken } = getStoredTokens();
-      const savedUser = localStorage.getItem('shortlink_user');
-
-      if (accessToken && savedUser) {
-        try {
-          setUser(JSON.parse(savedUser));
-          const res = await api.getProfile();
-          if (res.user) {
-            setUser(res.user);
-            localStorage.setItem('shortlink_user', JSON.stringify(res.user));
-          }
-        } catch (err) {
-          console.warn('[Auth] Session validation failed:', err.message);
-        }
+      if (!accessToken) {
+        setLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      try {
+        const res = await api.getProfile();
+        if (res.user) {
+          setUser(res.user);
+          localStorage.setItem('shortlink_user', JSON.stringify(res.user));
+        }
+      } catch (err) {
+        clearStoredTokens();
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    initAuth();
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
     const res = await api.login({ email, password });
-    setUser(res.user);
-    setStoredTokens(res.accessToken, res.refreshToken);
-    localStorage.setItem('shortlink_user', JSON.stringify(res.user));
-    return res.user;
+    if (res.user && res.accessToken) {
+      setUser(res.user);
+      setStoredTokens(res.accessToken, res.refreshToken);
+      localStorage.setItem('shortlink_user', JSON.stringify(res.user));
+    }
+    return res;
   };
 
-  const register = async (name, email, password, role = 'user') => {
+  const loginDemo = async (role = 'user') => {
+    const res = await api.demoLogin(role);
+    if (res.user && res.accessToken) {
+      setUser(res.user);
+      setStoredTokens(res.accessToken, res.refreshToken);
+      localStorage.setItem('shortlink_user', JSON.stringify(res.user));
+    }
+    return res;
+  };
+
+  const loginWithGoogle = async (payload = {}) => {
+    const res = await api.googleLogin(payload);
+    if (res.user && res.accessToken) {
+      setUser(res.user);
+      setStoredTokens(res.accessToken, res.refreshToken);
+      localStorage.setItem('shortlink_user', JSON.stringify(res.user));
+    }
+    return res;
+  };
+
+  const register = async (name, email, password, role) => {
     const res = await api.register({ name, email, password, role });
-    setUser(res.user);
-    setStoredTokens(res.accessToken, res.refreshToken);
-    localStorage.setItem('shortlink_user', JSON.stringify(res.user));
-    return res.user;
+    if (res.user && res.accessToken) {
+      setUser(res.user);
+      setStoredTokens(res.accessToken, res.refreshToken);
+      localStorage.setItem('shortlink_user', JSON.stringify(res.user));
+    }
+    return res;
   };
 
   const logout = async () => {
     try {
       await api.logout();
-    } catch (e) {
+    } catch (err) {
+      // Ignore network errors on logout
     } finally {
-      setUser(null);
       clearStoredTokens();
+      setUser(null);
     }
   };
 
-  const value = {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
-    login,
-    register,
-    logout,
-  };
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === 'admin';
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated,
+        isAdmin,
+        login,
+        loginDemo,
+        loginWithGoogle,
+        register,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

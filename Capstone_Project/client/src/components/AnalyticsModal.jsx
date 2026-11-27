@@ -49,238 +49,253 @@ export const AnalyticsModal = ({ linkId, isOpen, onClose }) => {
   const totalClicks = data?.link?.totalClicks || 0;
   const clicksByDevice = data?.analytics?.clicksByDevice || [];
   const clicksByDay = data?.analytics?.clicksByDay || [];
-  const clicksByBrowser = data?.analytics?.clicksByBrowser || [];
   const recentClicks = data?.analytics?.recentClicks || [];
 
   const getDeviceIcon = (device) => {
-    switch (device) {
-      case 'Mobile':
-        return <IconSmartphone size={16} />;
-      case 'Tablet':
-        return <IconTablet size={16} />;
-      default:
-        return <IconLaptop size={16} />;
-    }
+    const devLower = (device || '').toLowerCase();
+    if (devLower.includes('mobile')) return <IconSmartphone size={16} />;
+    if (devLower.includes('tablet')) return <IconTablet size={16} />;
+    return <IconLaptop size={16} />;
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content wide" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <IconBarChart size={18} style={{ color: 'var(--accent)' }} />
-            <h3>Click Analytics & Insights</h3>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '680px' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div
+              style={{
+                background: 'rgba(56, 189, 248, 0.15)',
+                color: 'var(--accent)',
+                padding: '0.45rem',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <IconBarChart size={20} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Click Analytics & Insights</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                Powered by real-time MongoDB Aggregation Pipelines
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
             className="btn btn-icon"
-            style={{ border: 'none', fontSize: '1.25rem', padding: '0.2rem 0.5rem' }}
+            style={{ fontSize: '1.4rem', lineHeight: 1 }}
           >
             &times;
           </button>
         </div>
 
-        <div className="modal-body">
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-secondary)' }}>
-              Loading aggregation analytics...
-            </div>
-          ) : error ? (
-            <div className="alert alert-danger">{error}</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {/* Header Overview Card */}
-              <div
-                style={{
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '1.25rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '1rem',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <code style={{ fontSize: '1.1rem', color: 'var(--accent)', fontWeight: 600 }}>
-                      /{data.link.shortCode}
-                    </code>
-                    <button
-                      onClick={copyShortUrl}
-                      className="btn btn-icon btn-sm"
-                      title="Copy short link"
-                    >
-                      {copied ? <IconCheck size={14} style={{ color: 'var(--success)' }} /> : <IconCopy size={14} />}
-                    </button>
-                    <a
-                      href={data.link.shortUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-icon btn-sm"
-                      title="Open short link in new tab"
-                    >
-                      <IconExternalLink size={14} />
-                    </a>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.8rem',
-                      color: 'var(--text-muted)',
-                      marginTop: '0.35rem',
-                      maxWidth: '450px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Target: {data.link.originalUrl}
-                  </div>
-                </div>
-
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 700, lineHeight: 1 }}>
-                    {totalClicks}
-                  </div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Total Engagements
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '3.5rem 0', color: 'var(--text-secondary)' }}>
+            Loading aggregation analytics...
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger">{error}</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* Header Link Card */}
+            <div
+              style={{
+                backgroundColor: 'var(--bg-app)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.25rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '1.15rem', color: '#ee6123', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                    /{data.link.alias || data.link.shortCode}
                   </span>
+                  <button
+                    onClick={copyShortUrl}
+                    className="btn btn-icon btn-sm"
+                    title="Copy short link"
+                    style={{ color: copied ? 'var(--success)' : 'var(--text-muted)' }}
+                  >
+                    {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                  </button>
+                  <a
+                    href={data.link.shortUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-icon btn-sm"
+                    title="Open destination"
+                  >
+                    <IconExternalLink size={14} />
+                  </a>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '420px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '0.2rem' }}>
+                  {data.link.originalUrl}
                 </div>
               </div>
 
-              {/* Unique Twist: MongoDB Aggregations Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                {/* 1. Device Type Aggregation */}
-                <div className="card">
-                  <h4 style={{ fontSize: '0.9rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <IconSmartphone size={16} style={{ color: 'var(--accent)' }} />
-                    Clicks by Device Type (Aggregation)
-                  </h4>
-
-                  {clicksByDevice.length === 0 ? (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No device data recorded yet.</p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {clicksByDevice.map((item) => {
-                        const percentage = totalClicks > 0 ? Math.round((item.clicks / totalClicks) * 100) : 0;
-                        return (
-                          <div key={item.device}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', marginBottom: '0.25rem' }}>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                {getDeviceIcon(item.device)}
-                                {item.device}
-                              </span>
-                              <span style={{ fontFamily: 'var(--font-mono)' }}>
-                                {item.clicks} ({percentage}%)
-                              </span>
-                            </div>
-                            <div style={{ height: '6px', backgroundColor: 'var(--bg-app)', borderRadius: '3px', overflow: 'hidden' }}>
-                              <div
-                                style={{
-                                  width: `${percentage}%`,
-                                  height: '100%',
-                                  backgroundColor: 'var(--accent)',
-                                  borderRadius: '3px',
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981', lineHeight: 1 }}>
+                  {totalClicks}
                 </div>
-
-                {/* 2. Clicks by Day Aggregation */}
-                <div className="card">
-                  <h4 style={{ fontSize: '0.9rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <IconClock size={16} style={{ color: '#34d399' }} />
-                    Daily Traffic Timeline (Aggregation)
-                  </h4>
-
-                  {clicksByDay.length === 0 ? (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No clicks recorded yet.</p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                      {clicksByDay.map((item) => {
-                        const maxDaily = Math.max(...clicksByDay.map((d) => d.clicks), 1);
-                        const fillWidth = Math.round((item.clicks / maxDaily) * 100);
-                        return (
-                          <div key={item.date} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', width: '85px' }}>
-                              {item.date}
-                            </span>
-                            <div style={{ flex: 1, height: '8px', backgroundColor: 'var(--bg-app)', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div
-                                style={{
-                                  width: `${fillWidth}%`,
-                                  height: '100%',
-                                  backgroundColor: '#10b981',
-                                  borderRadius: '4px',
-                                }}
-                              />
-                            </div>
-                            <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', fontWeight: 600, width: '30px', textAlign: 'right' }}>
-                              {item.clicks}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.2rem' }}>
+                  Total Clicks
                 </div>
-              </div>
-
-              {/* 3. Recent Click Stream */}
-              <div className="card" style={{ padding: '1rem' }}>
-                <h4 style={{ fontSize: '0.875rem', marginBottom: '0.75rem' }}>Recent Click Activity Stream</h4>
-                {recentClicks.length === 0 ? (
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>No recent click events yet.</p>
-                ) : (
-                  <div className="table-wrapper">
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th>Timestamp</th>
-                          <th>Device</th>
-                          <th>Browser</th>
-                          <th>OS</th>
-                          <th>Referrer</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {recentClicks.map((c) => (
-                          <tr key={c._id}>
-                            <td style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
-                              {new Date(c.timestamp).toLocaleString()}
-                            </td>
-                            <td>
-                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                                {getDeviceIcon(c.deviceType)}
-                                {c.deviceType}
-                              </span>
-                            </td>
-                            <td>{c.browser}</td>
-                            <td>{c.os}</td>
-                            <td style={{ color: 'var(--text-secondary)' }}>{c.referrer}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
               </div>
             </div>
-          )}
-        </div>
 
-        <div className="modal-footer">
-          <button onClick={onClose} className="btn btn-secondary">
-            Close
-          </button>
-        </div>
+            {/* Device Distribution Pipeline */}
+            <div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <IconSmartphone size={16} style={{ color: 'var(--accent)' }} />
+                <span>Device Breakdown ($group & $project)</span>
+              </h4>
+
+              {clicksByDevice.length === 0 ? (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.5rem 0' }}>
+                  No device data recorded yet.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                  {clicksByDevice.map((d) => {
+                    const pct = totalClicks > 0 ? Math.round((d.count / totalClicks) * 100) : 0;
+                    return (
+                      <div key={d.device} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', textTransform: 'capitalize' }}>
+                            {getDeviceIcon(d.device)}
+                            <strong>{d.device || 'Desktop'}</strong>
+                          </span>
+                          <span style={{ color: 'var(--text-secondary)' }}>
+                            {d.count} clicks ({pct}%)
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            height: '8px',
+                            background: 'var(--bg-app)',
+                            borderRadius: 'var(--radius-full)',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: '100%',
+                              width: `${pct}%`,
+                              background: 'linear-gradient(90deg, #ee6123, #38bdf8)',
+                              borderRadius: 'var(--radius-full)',
+                              transition: 'width 0.4s ease',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Daily Timeline */}
+            <div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <IconClock size={16} style={{ color: '#10b981' }} />
+                <span>7-Day Engagement Timeline</span>
+              </h4>
+
+              {clicksByDay.length === 0 ? (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.5rem 0' }}>
+                  No clicks recorded in the last 7 days.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.6rem', height: '110px', paddingTop: '10px' }}>
+                  {clicksByDay.map((day) => {
+                    const maxClicks = Math.max(...clicksByDay.map((c) => c.clicks), 1);
+                    const barHeight = Math.max((day.clicks / maxClicks) * 75, 12);
+                    return (
+                      <div
+                        key={day.date}
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 700 }}>
+                          {day.clicks}
+                        </span>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: `${barHeight}px`,
+                            background: 'linear-gradient(180deg, #10b981 0%, rgba(16, 185, 129, 0.25) 100%)',
+                            borderRadius: '4px',
+                          }}
+                        />
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                          {day.date.slice(5)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Click Logs */}
+            {recentClicks.length > 0 && (
+              <div>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.65rem' }}>
+                  Recent Access Events
+                </h4>
+                <div
+                  style={{
+                    background: 'var(--bg-app)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-sm)',
+                    maxHeight: '140px',
+                    overflowY: 'auto',
+                    fontSize: '0.78rem',
+                  }}
+                >
+                  {recentClicks.map((c, i) => (
+                    <div
+                      key={c._id || i}
+                      style={{
+                        padding: '0.45rem 0.75rem',
+                        borderBottom: i < recentClicks.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span style={{ textTransform: 'capitalize', color: 'var(--text-primary)' }}>
+                        {c.deviceType || 'Desktop'} &bull; {c.referer || 'Direct'}
+                      </span>
+                      <span style={{ color: 'var(--text-muted)' }}>
+                        {new Date(c.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

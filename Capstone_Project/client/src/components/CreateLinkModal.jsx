@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
-import { IconLink, IconClock, IconAlert } from './Icons';
+import { IconLink, IconClock, IconAlert, IconZap } from './Icons';
 
 export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
   const [originalUrl, setOriginalUrl] = useState('');
@@ -44,24 +44,41 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <IconLink size={18} style={{ color: 'var(--accent)' }} />
-            <h3>Create Short Link</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div
+              style={{
+                background: 'rgba(238, 97, 35, 0.15)',
+                color: '#ee6123',
+                padding: '0.45rem',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <IconLink size={20} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Create New Short Link</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                Transform any long URL into a trackable short link
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
             className="btn btn-icon"
-            style={{ border: 'none', fontSize: '1.25rem', padding: '0.2rem 0.5rem' }}
+            style={{ fontSize: '1.4rem', lineHeight: 1 }}
           >
             &times;
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {error && (
               <div className="alert alert-danger">
                 <IconAlert size={16} />
@@ -69,12 +86,12 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
               </div>
             )}
 
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label">
                 Destination URL <span style={{ color: 'var(--danger)' }}>*</span>
               </label>
               <input
-                type="text"
+                type="url"
                 className="form-input"
                 placeholder="https://example.com/very/long/destination/url"
                 value={originalUrl}
@@ -82,18 +99,18 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
                 autoFocus
                 required
               />
-              <span className="form-helper">The destination webpage you want to redirect visitors to.</span>
+              <span className="form-helper">The destination webpage visitors will be redirected to.</span>
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label">Custom Alias (Optional)</label>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span
                   style={{
-                    backgroundColor: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
+                    backgroundColor: 'var(--bg-app)',
+                    border: '1px solid var(--border-strong)',
                     borderRight: 'none',
-                    padding: '0.625rem 0.75rem',
+                    padding: '0.65rem 0.85rem',
                     borderTopLeftRadius: 'var(--radius-sm)',
                     borderBottomLeftRadius: 'var(--radius-sm)',
                     color: 'var(--text-muted)',
@@ -101,7 +118,7 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
                     fontFamily: 'var(--font-mono)',
                   }}
                 >
-                  shortlink.dev/
+                  localhost:5000/
                 </span>
                 <input
                   type="text"
@@ -116,7 +133,7 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
                   }}
                 />
               </div>
-              <span className="form-helper">Leave blank to generate a high-entropy crypto short code automatically.</span>
+              <span className="form-helper">Leave empty to generate a random 6-character crypto code.</span>
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
@@ -130,16 +147,39 @@ export const CreateLinkModal = ({ isOpen, onClose, onLinkCreated }) => {
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
               />
-              <span className="form-helper">The link will automatically stop redirecting after this timestamp.</span>
+              <span className="form-helper">Link will return 410 Gone after this date/time.</span>
             </div>
           </div>
 
-          <div className="modal-footer">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '0.75rem',
+              marginTop: '1.75rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid var(--border-subtle)',
+            }}
+          >
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-              {isSubmitting ? 'Creating...' : 'Shorten URL'}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn"
+              style={{
+                background: 'linear-gradient(135deg, #ee6123, #ff7a45)',
+                color: '#ffffff',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              <IconZap size={15} />
+              <span>{isSubmitting ? 'Shortening...' : 'Create Short Link'}</span>
             </button>
           </div>
         </form>
