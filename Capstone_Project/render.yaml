@@ -1,0 +1,39 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: shortlink-backend
+    env: node
+    plan: free
+    rootDir: Capstone_Project/server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRY
+        value: 15m
+      - key: JWT_REFRESH_EXPIRY
+        value: 7d
+      - key: MONGO_URI
+        sync: false # Set to your MongoDB Atlas connection string
+
+  # Frontend Static Site
+  - type: web
+    name: shortlink-frontend
+    env: static
+    plan: free
+    rootDir: Capstone_Project/client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: shortlink-backend
+          property: host
