@@ -6,37 +6,35 @@ const handleRedirect = async (req, res, next) => {
   try {
     const { code } = req.params;
 
-    if (!code || ['favicon.ico', 'robots.txt', 'api', 'health'].includes(code.toLowerCase())) {
+    const reservedRoutes = [
+      'favicon.ico',
+      'robots.txt',
+      'api',
+      'health',
+      'login',
+      'register',
+      'dashboard',
+      'admin',
+      'assets',
+      'code_video.html',
+    ];
+
+    if (!code || reservedRoutes.includes(code.toLowerCase())) {
       return next();
     }
 
     const link = await Link.findOne({ shortCode: code });
 
     if (!link) {
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Link Not Found – ShortLink</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #09090b; color: #f4f4f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #18181b; border: 1px solid #27272a; padding: 2.5rem; border-radius: 12px; max-width: 440px; text-align: center; }
-            h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #ef4444; }
-            p { color: #a1a1aa; line-height: 1.6; font-size: 0.95rem; }
-            a { display: inline-block; margin-top: 1.25rem; color: #38bdf8; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
-            a:hover { text-decoration: underline; }
-          </style>
-        </head>
-        <body>
-          <div class="card">
-            <h1>404 – Link Not Found</h1>
-            <p>The short link <code>/${code}</code> does not exist or may have been deleted.</p>
-            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}">&larr; Return to ShortLink Home</a>
-          </div>
-        </body>
-        </html>
-      `);
+      // If browser navigation, let React SPA display its own Not Found page
+      if (req.accepts('html')) {
+        return next();
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: `Short link /${code} does not exist or has been removed`,
+      });
     }
 
     if (link.isBlocked) {
@@ -47,11 +45,12 @@ const handleRedirect = async (req, res, next) => {
           <meta charset="UTF-8">
           <title>Link Blocked – ShortLink</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #09090b; color: #f4f4f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #18181b; border: 1px solid #dc2626; padding: 2.5rem; border-radius: 12px; max-width: 460px; text-align: center; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #080c14; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #141e33; border: 1px solid #dc2626; padding: 2.5rem; border-radius: 12px; max-width: 460px; text-align: center; }
             h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #ef4444; }
-            p { color: #a1a1aa; line-height: 1.6; font-size: 0.95rem; }
-            .reason { background: #27272a; padding: 0.75rem; border-radius: 6px; color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; }
+            p { color: #94a3b8; line-height: 1.6; font-size: 0.95rem; }
+            .reason { background: #0b1120; padding: 0.75rem; border-radius: 6px; color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; }
+            a { display: inline-block; margin-top: 1.25rem; color: #ee6123; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
           </style>
         </head>
         <body>
@@ -59,6 +58,7 @@ const handleRedirect = async (req, res, next) => {
             <h1>Link Suspended</h1>
             <p>This link has been blocked by an administrator due to safety or policy violations.</p>
             ${link.blockReason ? `<div class="reason">Reason: ${link.blockReason}</div>` : ''}
+            <a href="/">&larr; Return to ShortLink Home</a>
           </div>
         </body>
         </html>
@@ -73,16 +73,18 @@ const handleRedirect = async (req, res, next) => {
           <meta charset="UTF-8">
           <title>Link Expired – ShortLink</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #09090b; color: #f4f4f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #18181b; border: 1px solid #eab308; padding: 2.5rem; border-radius: 12px; max-width: 440px; text-align: center; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #080c14; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #141e33; border: 1px solid #eab308; padding: 2.5rem; border-radius: 12px; max-width: 440px; text-align: center; }
             h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #eab308; }
-            p { color: #a1a1aa; line-height: 1.6; font-size: 0.95rem; }
+            p { color: #94a3b8; line-height: 1.6; font-size: 0.95rem; }
+            a { display: inline-block; margin-top: 1.25rem; color: #ee6123; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
           </style>
         </head>
         <body>
           <div class="card">
             <h1>Link Expired</h1>
             <p>This short link expired on <strong>${new Date(link.expiresAt).toLocaleString()}</strong> and is no longer accessible.</p>
+            <a href="/">&larr; Return to ShortLink Home</a>
           </div>
         </body>
         </html>
